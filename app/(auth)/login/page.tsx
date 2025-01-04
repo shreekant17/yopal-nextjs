@@ -24,26 +24,36 @@ import { toast } from 'react-toastify';
 
 export default function App() {
     const [password, setPassword] = React.useState("");
-    const [submitted, setSubmitted] = React.useState(null);
+    const [submitted, setSubmitted] = React.useState<{ [key: string]: string | File } | null>(null);
     const [errors, setErrors] = React.useState({});
     const router = useRouter();
 
     // Real-time password validation
-    const getPasswordError = (value) => {
+    const getPasswordError = (value: string): string | undefined => {
         if (value.length < 4 && value.length > 1) {
             return "Must be 4 characters or more";
         }
-        return null;
+        return undefined;
     };
 
-    const onSubmit = async (e) => {
+    const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const data = Object.fromEntries(new FormData(e.currentTarget));
+        const formData = new FormData(e.currentTarget);
+        const data: { [key: string]: string | File } = {};
+
+        // Convert FormData to a plain object
+        formData.forEach((value, key) => {
+            data[key] = value; // value is either string or File
+        });
+
         console.log("Form Data Submitted:", data);
 
         // Custom validation checks
-        const newErrors = {};
-        const passwordError = getPasswordError(data.password);
+        const newErrors: { [key: string]: string } = {};
+
+        // Ensure password is treated as a string
+        const password = data.password as string;
+        const passwordError = getPasswordError(password);
 
         if (passwordError) {
             newErrors.password = passwordError;
@@ -54,6 +64,7 @@ export default function App() {
             return;
         }
 
+        // Clear errors and proceed with submission
         setErrors({});
         setSubmitted(data);
 
@@ -69,7 +80,6 @@ export default function App() {
             if (response.ok) {
                 const result = await response.json();
                 toast.success("Login Successful");
-                //console.log(result);
                 localStorage.setItem("token", `Bearer ${result.token}`);
                 router.push("/feed");
             } else {
@@ -81,6 +91,7 @@ export default function App() {
             toast.error("Something Went Wrong");
         }
     };
+
 
     return (
         <div className="flex justify-center items-center w-full">

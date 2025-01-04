@@ -1,12 +1,28 @@
 import { Button } from "@nextui-org/react";
 
-export const HeartIcon = ({ fill = "currentColor", filled, size, height, width, ...props }) => {
+type HeartIconProps = {
+    fill?: string;
+    filled?: boolean;
+    size?: number | string;
+    height?: number | string;
+    width?: number | string;
+    [key: string]: any; // Allow additional props
+};
+
+export const HeartIcon = ({
+    fill = "currentColor",
+    filled = true,
+    size = 24,
+    height,
+    width,
+    ...props
+}: HeartIconProps) => {
     return (
         <svg
             fill={filled ? fill : "none"}
-            height={size || height || 24}
+            height={height || size}
+            width={width || size}
             viewBox="0 0 24 24"
-            width={size || width || 24}
             xmlns="http://www.w3.org/2000/svg"
             {...props}
         >

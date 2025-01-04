@@ -1,12 +1,26 @@
 import { Button } from "@nextui-org/react";
 
-export const PlusIcon = ({ fill = "currentColor", size, height, width, ...props }) => {
+type PlusIconProps = {
+    fill?: string;
+    size?: number | string;
+    height?: number | string;
+    width?: number | string;
+    [key: string]: any; // Allow additional props
+};
+
+export const PlusIcon = ({
+    fill = "currentColor",
+    size = 24,
+    height,
+    width,
+    ...props
+}: PlusIconProps) => {
     return (
         <svg
             fill={fill}
-            height={size || height || 24}
+            height={height || size}
+            width={width || size}
             viewBox="0 0 24 24"
-            width={size || width || 24}
             xmlns="http://www.w3.org/2000/svg"
             {...props}
         >

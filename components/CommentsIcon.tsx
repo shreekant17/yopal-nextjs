@@ -1,11 +1,27 @@
 import { Button } from "@nextui-org/react";
 
-export const CommentsIcon = ({ fill = "currentColor", filled, size, height, width, ...props }) => {
+// Define prop types for the icon component
+type CommentsIconProps = {
+    fill?: string; // default: "currentColor"
+    filled?: boolean; // optional, used to toggle fill behavior
+    size?: number | string; // can be number or string for width/height
+    height?: number | string; // optional, overrides size if provided
+    width?: number | string; // optional, overrides size if provided
+};
+
+export const CommentsIcon = ({
+    fill = "currentColor",
+    filled = true,
+    size = 24,
+    height,
+    width,
+    ...props
+}: CommentsIconProps) => {
     return (
         <svg
             fill={filled ? fill : "none"}
-            height={size || height || 24}
-            width={size || width || 24}
+            height={height || size}
+            width={width || size}
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
             {...props}

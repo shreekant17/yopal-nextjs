@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react'
+import React, { FormEvent } from 'react'
 import {
   Modal,
   ModalContent,
@@ -16,31 +16,38 @@ import {
   RadioGroup,
   Radio
 } from "@nextui-org/react";
-
 import { toast } from 'react-toastify';
 
-const UploadPost = ({ isOpen, onClose }) => {
-  const size = "l";
-  const [btnSatus, setBtnStatus] = React.useState(true);
-  const [submitted, setSubmitted] = React.useState(null);
-  const [imagePreview, setImagePreview] = React.useState(null); // State for image preview
+// Typing for the props passed to the UploadPost component
+type UploadPostProps = {
+  isOpen: boolean;
+  onClose: () => void;
+};
 
-  const handleFileChange = (e) => {
+const UploadPost = ({ isOpen, onClose }: UploadPostProps) => {
+  const size = "lg";
+
+  // Typing the state variables
+  const [btnStatus, setBtnStatus] = React.useState<boolean>(true);
+  const [submitted, setSubmitted] = React.useState<any>(null);
+  const [imagePreview, setImagePreview] = React.useState<string | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBtnStatus(true);
-    const file = e.target.files[0];
+    const file = e.target.files ? e.target.files[0] : null;
+
     if (file) {
       // Create a preview URL for the selected file
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result); // Set the image preview URL
-
+        setImagePreview(reader.result as string); // Set the image preview URL
       };
       reader.readAsDataURL(file); // Read the file as data URL
       setBtnStatus(false);
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const token = localStorage.getItem("token");
@@ -66,7 +73,6 @@ const UploadPost = ({ isOpen, onClose }) => {
     }
   };
 
-
   return (
     <div>
       <Modal isOpen={isOpen} size={size} onClose={onClose}>
@@ -78,7 +84,7 @@ const UploadPost = ({ isOpen, onClose }) => {
                 id="upload-form"
                 className="p-4 w-full justify-center items-center space-y-4"
                 validationBehavior="native"
-                encType='multipart/form-data'
+                encType="multipart/form-data"
                 onSubmit={handleSubmit}
               >
                 <div className="flex flex-col gap-4 max-w-md">
@@ -101,10 +107,9 @@ const UploadPost = ({ isOpen, onClose }) => {
                     placeholder="Enter your email"
                     type="file"
                     onChange={handleFileChange} // Add onChange handler
-                    className='w-full'
-
+                    className="w-full"
                   />
-                  <RadioGroup name='type' label="Select Media Type" orientation="horizontal" isRequired>
+                  <RadioGroup name="type" label="Select Media Type" orientation="horizontal" isRequired>
                     <Radio value="image">Picture</Radio>
                     <Radio value="video">Video</Radio>
                   </RadioGroup>
@@ -115,7 +120,7 @@ const UploadPost = ({ isOpen, onClose }) => {
                     label="Description"
                     placeholder="Description"
                     variant="bordered"
-                    name='content'
+                    name="content"
                   />
 
                 </div>
@@ -131,10 +136,15 @@ const UploadPost = ({ isOpen, onClose }) => {
               <Button color="danger" variant="light" onPress={onClose}>
                 Close
               </Button>
-              <Button form="upload-form" onPress={onClose}
-                type='submit' isDisabled={btnSatus} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg" color="primary">
+              <Button
+                form="upload-form"
+                onPress={onClose}
+                type="submit"
+                isDisabled={btnStatus}
+                className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
+                color="primary"
+              >
                 Post
-
               </Button>
             </ModalFooter>
           </>

@@ -26,29 +26,40 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL || "/api/register";
 
 export default function App() {
     const [password, setPassword] = React.useState("");
-    const [submitted, setSubmitted] = React.useState(null);
-    const [errors, setErrors] = React.useState({});
+    const [submitted, setSubmitted] = React.useState<{ [key: string]: string | File } | null>(null);
+    const [errors, setErrors] = React.useState<{ name?: string; email?: string; password?: string; terms?: string }>({});
     const router = useRouter();
 
     // Password validation
-    const getPasswordError = (value) => {
+    const getPasswordError = (value: string): string | undefined => {
         if (value.length < 4 && value.length > 1) {
-            return "Password must be at least 4 characters long";
+            return "Must be 4 characters or more";
         }
-        return null;
+        return undefined;
     };
 
-    const onSubmit = async (e) => {
+    const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const data = Object.fromEntries(new FormData(e.currentTarget));
+        const formData = new FormData(e.currentTarget);
+        const data: { [key: string]: string | File } = {};
+
+        // Convert FormData to a plain object
+        formData.forEach((value, key) => {
+            data[key] = value; // value is either string or File
+        });
+
+        console.log("Form Data Submitted:", data);
 
         // Custom validation
-        const newErrors = {};
+        const newErrors: { [key: string]: string } = {};
+
         if (data.name === "admin") {
             newErrors.name = "Choose a different username";
         }
 
-        const passwordError = getPasswordError(data.password);
+        // Handle password field (ensure it's a string)
+        const password = data.password as string;
+        const passwordError = getPasswordError(password);
         if (passwordError) {
             newErrors.password = passwordError;
         }
@@ -67,7 +78,7 @@ export default function App() {
         setSubmitted(data);
 
         try {
-            const response = await fetch("/api/register", {
+            const response = await fetch(apiUrl, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -83,10 +94,10 @@ export default function App() {
                 toast.error(result.message);
             }
         } catch (error) {
-            //console.error("Error:", error);
             toast.error("Error creating account");
         }
     };
+
 
     return (
         <div className="flex justify-center items-center w-full">
@@ -191,12 +202,7 @@ export default function App() {
                             </Button>
                         </div>
 
-                        {submitted && (
-                            <div className="text-sm text-gray-600 mt-4">
-                                Submitted data:{" "}
-                                <pre>{JSON.stringify(submitted, null, 2)}</pre>
-                            </div>
-                        )}
+
                     </Form>
                 </CardBody>
                 <Divider />

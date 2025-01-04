@@ -1,13 +1,36 @@
 "use client";
 import React, { useEffect } from "react";
-import { Button, Card, CardHeader, CardBody, CardFooter, Divider, Link, Image, User } from "@nextui-org/react";
+import {
+    Button,
+    Card,
+    CardHeader,
+    CardBody,
+    CardFooter,
+    Divider,
+    Link,
+    Image,
+    User,
+} from "@nextui-org/react";
 import { HeartFilledIcon } from "@/components/icons";
 import { HeartIcon } from "@/components/HeartIcon";
 import { ShareIcon } from "@/components/ShareIcon";
 import { CommentsIcon } from "@/components/CommentsIcon";
 
+// Define the types for User and Post
+type User = {
+    avatar: string;
+    email: string;
+    name: string;
+};
+
+type Post = {
+    user: User;
+    media: string;  // Added the media property (post image)
+    content: string; // Added content property for the post content
+};
+
 const Feed = () => {
-    const [posts, setPosts] = React.useState([]);
+    const [posts, setPosts] = React.useState<Post[]>([]); // Explicitly typing the posts state
 
     // Function to fetch posts
     const getAllPosts = async () => {
