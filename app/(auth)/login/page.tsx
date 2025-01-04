@@ -139,7 +139,7 @@ export default function App() {
                                 isRequired
                                 className="w-full" // Ensure the input field takes the full width
                                 errorMessage={getPasswordError(password)}
-                                isInvalid={getPasswordError(password) !== null}
+                                isInvalid={!!getPasswordError(password)}
                                 label="Password"
                                 name="password"
                                 type="password"
