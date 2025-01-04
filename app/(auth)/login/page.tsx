@@ -1,0 +1,170 @@
+"use client";
+
+import React from "react";
+import {
+    Form,
+    Input,
+    Select,
+    SelectItem,
+    Checkbox,
+    Button,
+} from "@nextui-org/react";
+import { useRouter } from "next/navigation";
+import {
+    Card,
+    CardHeader,
+    CardBody,
+    CardFooter,
+    Divider,
+    Link,
+    Image,
+} from "@nextui-org/react";
+
+import { toast } from 'react-toastify';
+
+export default function App() {
+    const [password, setPassword] = React.useState("");
+    const [submitted, setSubmitted] = React.useState(null);
+    const [errors, setErrors] = React.useState({});
+    const router = useRouter();
+
+    // Real-time password validation
+    const getPasswordError = (value) => {
+        if (value.length < 4 && value.length > 1) {
+            return "Must be 4 characters or more";
+        }
+        return null;
+    };
+
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(e.currentTarget));
+        console.log("Form Data Submitted:", data);
+
+        // Custom validation checks
+        const newErrors = {};
+        const passwordError = getPasswordError(data.password);
+
+        if (passwordError) {
+            newErrors.password = passwordError;
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+
+        setErrors({});
+        setSubmitted(data);
+
+        try {
+            const response = await fetch("/api/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                toast.success("Login Successful");
+                //console.log(result);
+                localStorage.setItem("token", `Bearer ${result.token}`);
+                router.push("/feed");
+            } else {
+                const result = await response.json();
+                toast.error(result.message);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            toast.error("Something Went Wrong");
+        }
+    };
+
+    return (
+        <div className="flex justify-center items-center w-full">
+            <Card className="w-full max-w-sm p-6 shadow-2xl">
+                <CardHeader className="flex gap-3">
+                    <Image
+                        alt="nextui logo"
+                        height={40}
+                        radius="sm"
+                        src="./icon.png"
+                        width={40}
+                    />
+                    <div className="flex flex-col">
+                        <p className="text-md font-bold">Yo!Pal</p>
+                        <p className="text-small text-default-500">yo-pal.in</p>
+                    </div>
+                </CardHeader>
+                <Divider />
+                <CardBody>
+                    <Form
+                        encType="multipart/form-data"
+                        className="p-4 w-full space-y-6"
+                        validationBehavior="native"
+                        validationErrors={errors}
+                        onReset={() => setSubmitted(null)}
+                        onSubmit={onSubmit}
+                    >
+                        <div className="flex flex-col gap-6 w-full">
+                            <Input
+                                isRequired
+                                className="w-full" // Ensure the input field takes the full width
+                                errorMessage={({ validationDetails }) => {
+                                    if (validationDetails.valueMissing) {
+                                        return "Please enter your email";
+                                    }
+                                    if (validationDetails.typeMismatch) {
+                                        return "Please enter a valid email address";
+                                    }
+                                }}
+                                label="Email"
+                                name="email"
+                                type="email"
+                            />
+                            <Input
+                                isRequired
+                                className="w-full" // Ensure the input field takes the full width
+                                errorMessage={getPasswordError(password)}
+                                isInvalid={getPasswordError(password) !== null}
+                                label="Password"
+                                name="password"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                            <Checkbox
+                                isRequired
+                                className="text-small"
+                                name="remember"
+                                validationBehavior="aria"
+                                value="true"
+                            >
+                                Remember me
+                            </Checkbox>
+                            <div className="flex">
+                                <Button
+                                    className="w-full bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
+                                    type="submit"
+                                    radius="full"
+                                >
+                                    Login
+                                </Button>
+                            </div>
+                        </div>
+
+                    </Form>
+                </CardBody>
+                <Divider />
+                <CardFooter>
+                    <Link showAnchorIcon href="#">
+                        Caution! Site Under Construction
+                    </Link>
+                </CardFooter>
+            </Card>
+        </div>
+
+    );
+}
