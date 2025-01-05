@@ -40,7 +40,7 @@ export const POST = async (req) => {
             //await connectMongoDB();
             //await Post.create(post);
         }
-        return NextResponse.json({ Message: "Success", status: 201 });
+        return NextResponse.json({ Message: "Success", media:media, status: 201 });
     } catch (error) {
         console.log("Error occured ", error);
         return NextResponse.json({ Message: "Failed", status: 500 });
