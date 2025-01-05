@@ -23,7 +23,7 @@ export const POST = async (req) => {
     try {
         // Convert file to buffer
         const buffer = Buffer.from(await file.arrayBuffer());
-
+        return NextResponse.json({ Message: "Buffer Created." }, { status: 200 });
         // Upload to Cloudinary
         const uploadResponse = await new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
