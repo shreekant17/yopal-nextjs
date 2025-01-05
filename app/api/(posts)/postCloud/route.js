@@ -1,9 +1,9 @@
-
 import { NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 import { verifyToken } from "@/libs/jwt";
 import Post from "@/models/postSchema";
 import connectMongoDB from "@/libs/db";
+import { Readable } from "stream";  // Import stream module
 
 // Configure Cloudinary
 cloudinary.config({
@@ -21,10 +21,10 @@ export const POST = async (req) => {
     }
 
     try {
-        // Convert file to buffer
-        const buffer = Buffer.from(await file.arrayBuffer());
-        return NextResponse.json({ Message: "Buffer Created." }, { status: 200 });
-        // Upload to Cloudinary
+        // Convert file to a readable stream
+        const fileStream = Readable.from(file.stream());
+
+        // Upload to Cloudinary directly using the upload stream
         const uploadResponse = await new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
                 { folder: "posts" },
@@ -36,7 +36,9 @@ export const POST = async (req) => {
                     }
                 }
             );
-            uploadStream.end(buffer);
+
+            // Pipe the readable file stream to Cloudinary upload stream
+            fileStream.pipe(uploadStream);
         });
 
         // Extract uploaded file URL
@@ -56,7 +58,6 @@ export const POST = async (req) => {
                 type: type,
                 media: mediaUrl,
             };
-
 
             await connectMongoDB();
             await Post.create(post);
