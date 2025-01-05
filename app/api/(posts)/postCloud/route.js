@@ -27,32 +27,32 @@ export const POST = async (req) => {
 
     try {
 
-        const uploadToCloudinary = () => {
-            return new Promise((resolve, reject) => {
-
-                var result = cloudinary.uploader.upload(fileUri, {
-                    folder: 'posts',
-                    invalidate: true
-                })
-                    .then((result) => {
-                        console.log(result);
-                        resolve(result);
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                        reject(error);
-                    });
-            });
-        };
-
-        const result = await uploadToCloudinary();
-
-        let imageUrl = result.secure_url;
-
         const token = data.get('token');
+
         if (token) {
+            const uploadToCloudinary = () => {
+                return new Promise((resolve, reject) => {
+
+                    var result = cloudinary.uploader.upload(fileUri, {
+                        folder: 'posts',
+                        invalidate: true
+                    })
+                        .then((result) => {
+                            console.log(result);
+                            resolve(result);
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                            reject(error);
+                        });
+                });
+            };
+
+            const result = await uploadToCloudinary();
+
+            const imageUrl = result.secure_url;
+
             const user = verifyToken(token);
-            console.log(user);
             const email = user.email;
             const content = data.get('content');
             const type = data.get('type');
