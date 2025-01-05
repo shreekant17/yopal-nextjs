@@ -21,10 +21,8 @@ export const POST = async (req) => {
     }
 
     try {
-        // Save file temporarily
-        const tempDir = path.join(process.cwd(), "temp");
-        if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
-
+        // Save file temporarily in Vercel's writable /tmp directory
+        const tempDir = "/tmp"; // Writable directory in Vercel
         const tempFilePath = path.join(tempDir, file.name);
         const buffer = Buffer.from(await file.arrayBuffer());
         fs.writeFileSync(tempFilePath, buffer);
@@ -55,13 +53,13 @@ export const POST = async (req) => {
                 media: mediaUrl,
             };
 
-            //await connectMongoDB();
-           //await Post.create(post);
+            await connectMongoDB();
+            await Post.create(post);
         }
 
         return NextResponse.json({ Message: "Success", mediaUrl: mediaUrl, status: 201 });
     } catch (error) {
         console.error("Error occurred:", error);
-        return NextResponse.json({ Message: "Failed", error:error, status: 500 });
+        return NextResponse.json({ Message: "Failed", error, status: 500 });
     }
 };
