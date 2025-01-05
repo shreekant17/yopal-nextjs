@@ -6,9 +6,9 @@ import connectMongoDB from "@/libs/db";
 
 // Configure Cloudinary
 cloudinary.config({
-    cloud_name: "dr28ndjfw",
-    api_key: "356566361623378",
-    api_secret: "f_l29kvSrVh5sEFJ-s9dZIaK6OU",
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
     secure: true,
 
 });
