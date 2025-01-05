@@ -48,13 +48,13 @@ export const POST = async (req) => {
 
         let imageUrl = result.secure_url;
 
-        const token = formData.get('token');
+        const token = data.get('token');
         if (token) {
             const user = verifyToken(token);
             console.log(user);
             const email = user.email;
-            const content = formData.get('content');
-            const type = formData.get('type');
+            const content = data.get('content');
+            const type = data.get('type');
             const media = imageUrl;
 
             const post = {
@@ -66,11 +66,11 @@ export const POST = async (req) => {
             await connectMongoDB();
             await Post.create(post);
 
-            return NextResponse.json(
-                { success: true, imageUrl: imageUrl },
-                { status: 200 }
-            );
         }
+        return NextResponse.json(
+            { success: true, imageUrl: imageUrl },
+            { status: 200 }
+        );
     } catch (error) {
         console.log("server err", error);
         return NextResponse.json({ err: "Internal Server Error" }, { status: 500 });
