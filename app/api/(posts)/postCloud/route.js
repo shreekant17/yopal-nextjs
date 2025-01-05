@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 import { verifyToken } from "@/libs/jwt";
@@ -20,44 +19,20 @@ export const POST = async (req) => {
         return NextResponse.json({ error: "No files received." }, { status: 400 });
     }
 
-    
-   
-
-    
     try {
-        // Convert file to buffer
-        const data = await req.formData();
-          const file = await data.get("file");
-          const fileBuffer = await file.arrayBuffer();
-        
-          var mime = image.type; 
-          var encoding = 'base64'; 
-          var base64Data = Buffer.from(fileBuffer).toString('base64');
-          var fileUri = 'data:' + mime + ';' + encoding + ',' + base64Data;
+        // Convert file to base64 string
+        const base64String = await file.arrayBuffer().then((buffer) =>
+            Buffer.from(buffer).toString("base64")
+        );
 
-        // Upload to Cloudinary
-        
+        // Upload to Cloudinary (using base64 string)
+        const uploadResponse = await cloudinary.uploader.upload(
+            `data:${file.type};base64,${base64String}`,
+            { folder: "posts" }
+        );
 
-         const uploadToCloudinary = () => {
-      return new Promise((resolve, reject) => {
-
-          var result = cloudinary.uploader.upload(fileUri, {
-            invalidate: true,
-              folder: "posts"
-          })
-            .then((result) => {
-              console.log(result);
-              resolve(result);
-            })
-            .catch((error) => {
-              console.log(error);
-              reject(error);
-            });
-      });
-    };
-
-    const result = await uploadToCloudinary();
-        const mediaUrl = result.secure_url;
+        // Extract uploaded file URL
+        const mediaUrl = uploadResponse.secure_url;
 
         // Token verification and database save (optional)
         const token = formData.get("token");
@@ -73,7 +48,6 @@ export const POST = async (req) => {
                 type: type,
                 media: mediaUrl,
             };
-
 
             await connectMongoDB();
             await Post.create(post);
