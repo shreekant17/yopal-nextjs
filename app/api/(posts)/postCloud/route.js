@@ -13,9 +13,13 @@ cloudinary.config({
 });
 
 export const POST = async (req) => {
+    try{
+        const formData = await req.formData();
+        return NextResponse.json({ Message: "Success Test", status: 201 });
+    }catch(err){
+        return NextResponse.json({ Message:err, status: 201 });
+    }
     
-    const formData = await req.formData();
-
     const file = formData.get("file");
     if (!file) {
         return NextResponse.json({ error: "No files received." }, { status: 400 });
