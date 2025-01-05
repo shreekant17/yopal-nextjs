@@ -35,10 +35,11 @@ const Feed: React.FC = () => {
     const [posts, setPosts] = useState<Post[]>([]); // State for posts
     const [likes, setLikes] = useState<Record<string, boolean>>({}); // State for likes
     const [likesCount, setLikesCount] = useState<Record<string, number>>({}); // State for likes count
-    const userId = localStorage.getItem("userId") || ""; // Handle potential `null` gracefully
+    const [userId, setUserId] = useState<string>("");
+    // Handle potential `null` gracefully
 
     // Function to fetch posts
-    const getAllPosts = async (): Promise<void> => {
+    const getAllPosts = async (userId: string): Promise<void> => {
         try {
             const response = await fetch("/api/fetchPosts", { method: "GET" });
             if (response.ok) {
@@ -105,7 +106,10 @@ const Feed: React.FC = () => {
 
     // Fetch posts when the component mounts
     useEffect(() => {
-        getAllPosts();
+        const storedUserId = localStorage.getItem("userId") || "";
+        setUserId(storedUserId);
+        console.log(storedUserId);
+        getAllPosts(storedUserId);
     }, []);
 
     return (
