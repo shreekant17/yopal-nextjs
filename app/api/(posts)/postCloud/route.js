@@ -19,12 +19,12 @@ export const POST = async (req) => {
     const data = await req.formData();
     const image = await data.get("file");
     const fileBuffer = await image.arrayBuffer();
-    
+
     var mime = image.type;
     var encoding = 'base64';
     var base64Data = Buffer.from(fileBuffer).toString('base64');
     var fileUri = 'data:' + mime + ';' + encoding + ',' + base64Data;
-    
+
     try {
 
         const uploadToCloudinary = () => {
@@ -48,10 +48,29 @@ export const POST = async (req) => {
 
         let imageUrl = result.secure_url;
 
-        return NextResponse.json(
-            { success: true, imageUrl: imageUrl },
-            { status: 200 }
-        );
+        const token = formData.get('token');
+        if (token) {
+            const user = verifyToken(token);
+            console.log(user);
+            const email = user.email;
+            const content = formData.get('content');
+            const type = formData.get('type');
+            const media = imageUrl;
+
+            const post = {
+                email: email,
+                content: content,
+                type: type,
+                media: media,
+            }
+            await connectMongoDB();
+            await Post.create(post);
+
+            return NextResponse.json(
+                { success: true, imageUrl: imageUrl },
+                { status: 200 }
+            );
+        }
     } catch (error) {
         console.log("server err", error);
         return NextResponse.json({ err: "Internal Server Error" }, { status: 500 });
