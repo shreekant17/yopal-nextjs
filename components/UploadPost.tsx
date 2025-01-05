@@ -57,7 +57,7 @@ const UploadPost = ({ isOpen, onClose }: UploadPostProps) => {
     }
 
     try {
-      const res = await fetch("/api/post", {
+      const res = await fetch("/api/postCloud", {
         method: "POST",
         body: formData,
       });
