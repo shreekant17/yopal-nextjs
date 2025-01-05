@@ -11,51 +11,47 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export const POST = async (req) => {
-    const formData = await req.formData();
 
-    const file = formData.get("file");
-    if (!file) {
-        return NextResponse.json({ error: "No files received." }, { status: 400 });
-    }
+export const POST = async (req) => {
+
+    const data = await req.formData();
+    const image = await data.get("file");
+    const fileBuffer = await image.arrayBuffer();
+
+    var mime = image.type;
+    var encoding = 'base64';
+    var base64Data = Buffer.from(fileBuffer).toString('base64');
+    var fileUri = 'data:' + mime + ';' + encoding + ',' + base64Data;
 
     try {
-        // Convert file to base64 string
-        const base64String = await file.arrayBuffer().then((buffer) =>
-            Buffer.from(buffer).toString("base64")
+
+        const uploadToCloudinary = () => {
+            return new Promise((resolve, reject) => {
+
+                var result = cloudinary.uploader.upload(fileUri, {
+                    invalidate: true
+                })
+                    .then((result) => {
+                        console.log(result);
+                        resolve(result);
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        reject(error);
+                    });
+            });
+        };
+
+        const result = await uploadToCloudinary();
+
+        let imageUrl = result.secure_url;
+
+        return NextResponse.json(
+            { success: true, imageUrl: imageUrl },
+            { status: 200 }
         );
-
-        // Upload to Cloudinary (using base64 string)
-        const uploadResponse = await cloudinary.uploader.upload(
-            `data:${file.type};base64,${base64String}`,
-            { folder: "posts" }
-        );
-
-        // Extract uploaded file URL
-        const mediaUrl = uploadResponse.secure_url;
-
-        // Token verification and database save (optional)
-        const token = formData.get("token");
-        if (token) {
-            const user = verifyToken(token);
-            const email = user.email;
-            const content = formData.get("content");
-            const type = formData.get("type");
-
-            const post = {
-                email: email,
-                content: content,
-                type: type,
-                media: mediaUrl,
-            };
-
-            await connectMongoDB();
-            await Post.create(post);
-        }
-
-        return NextResponse.json({ Message: "Success", status: 201 });
     } catch (error) {
-        console.error("Error occurred:", error);
-        return NextResponse.json({ Message: "Failed", status: 500 });
+        console.log("server err", error);
+        return NextResponse.json({ err: "Internal Server Error" }, { status: 500 });
     }
 };
