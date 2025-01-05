@@ -23,7 +23,7 @@ export const POST = async (req) => {
     try {
         // Convert file to a readable stream
         const fileStream = Readable.from(file.stream());
-
+        return NextResponse.json({ Success: "File Stream Created." }, { status: 200 });
         // Upload to Cloudinary directly using the upload stream
         const uploadResponse = await new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
