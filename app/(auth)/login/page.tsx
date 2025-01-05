@@ -81,6 +81,8 @@ export default function App() {
                 const result = await response.json();
                 toast.success("Login Successful");
                 localStorage.setItem("token", `Bearer ${result.token}`);
+                localStorage.setItem("userId", result.userId);
+
                 router.push("/feed");
             } else {
                 const result = await response.json();

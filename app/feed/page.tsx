@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Button,
     Card,
@@ -12,7 +12,6 @@ import {
     User,
     Skeleton,
 } from "@nextui-org/react";
-import { HeartFilledIcon } from "@/components/icons";
 import { HeartIcon } from "@/components/HeartIcon";
 import { ShareIcon } from "@/components/ShareIcon";
 import { CommentsIcon } from "@/components/CommentsIcon";
@@ -26,31 +25,53 @@ type User = {
 
 type Post = {
     user: User;
-    media: string;  // Added the media property (post image)
-    content: string; // Added content property for the post content
+    media: string;
+    content: string;
     _id: string;
     likes: string[];
 };
 
-
-
-const Feed = () => {
-    const [posts, setPosts] = React.useState<Post[]>([]); // Explicitly typing the posts state
+const Feed: React.FC = () => {
+    const [posts, setPosts] = useState<Post[]>([]); // State for posts
+    const [likes, setLikes] = useState<Record<string, boolean>>({}); // State for likes
+    const [likesCount, setLikesCount] = useState<Record<string, number>>({}); // State for likes count
+    const userId = localStorage.getItem("userId") || ""; // Handle potential `null` gracefully
 
     // Function to fetch posts
-    const getAllPosts = async () => {
+    const getAllPosts = async (): Promise<void> => {
         try {
             const response = await fetch("/api/fetchPosts", { method: "GET" });
             if (response.ok) {
                 const data = await response.json();
-                setPosts(data.posts || []); // Update state with posts
+                setPosts(data.posts || []);
+
+                // Initialize likes state and likesCount state based on fetched posts
+                const initialLikes = (data.posts || []).reduce(
+                    (acc: Record<string, boolean>, post: Post) => {
+                        acc[post._id] = post.likes.includes(userId);
+                        return acc;
+                    },
+                    {}
+                );
+                setLikes(initialLikes);
+
+                // Initialize likes count state based on fetched posts
+                const initialLikesCount = (data.posts || []).reduce(
+                    (acc: Record<string, number>, post: Post) => {
+                        acc[post._id] = post.likes.length;
+                        return acc;
+                    },
+                    {}
+                );
+                setLikesCount(initialLikesCount);
             }
         } catch (error) {
             console.error("Error fetching posts:", error);
         }
     };
 
-    const handleLike = async (postId: string) => {
+    // Function to handle liking a post
+    const handleLike = async (postId: string): Promise<void> => {
         const token = localStorage.getItem("token");
         if (token) {
             try {
@@ -59,18 +80,28 @@ const Feed = () => {
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ postId: postId, token: token }),
+                    body: JSON.stringify({ postId, token }),
                 });
                 if (response.ok) {
-
-                    const data = await response.json();
-
+                    // Toggle like state locally
+                    setLikes((prevLikes) => {
+                        const newLikes = { ...prevLikes, [postId]: !prevLikes[postId] };
+                        const newLikesCount = { ...likesCount };
+                        // Update likes count based on the toggle
+                        if (newLikes[postId]) {
+                            newLikesCount[postId] += 1; // Increment likes count
+                        } else {
+                            newLikesCount[postId] -= 1; // Decrement likes count
+                        }
+                        setLikesCount(newLikesCount); // Update likes count state
+                        return newLikes;
+                    });
                 }
-            } catch (err) {
-                console.error(err);
+            } catch (error) {
+                console.error("Error liking the post:", error);
             }
         }
-    }
+    };
 
     // Fetch posts when the component mounts
     useEffect(() => {
@@ -80,13 +111,13 @@ const Feed = () => {
     return (
         <div className="flex flex-col justify-center items-center gap-5">
             {posts.length > 0 ? (
-                posts.map((post, index) => (
-                    <Card key={index} className="w-auto">
+                posts.map((post) => (
+                    <Card key={post._id} className="w-auto">
                         <CardHeader className="flex gap-3">
                             <User
                                 avatarProps={{ src: post.user.avatar }}
                                 description={
-                                    <Link isExternal href={post.user.email} size="sm">
+                                    <Link isExternal href={`mailto:${post.user.email}`} size="sm">
                                         {post.user.name}
                                     </Link>
                                 }
@@ -97,65 +128,68 @@ const Feed = () => {
                         <CardBody className="overflow-visible py-2">
                             <Image
                                 isZoomed
-                                alt={"Post image"}
+                                alt="Post image"
                                 className="object-cover rounded-xl"
                                 src={post.media}
                                 width={500}
                             />
                         </CardBody>
                         <Divider />
-
                         <CardFooter className="flex gap-3">
-                            <Button isIconOnly aria-label="Like" color="danger" onPress={() => handleLike(post._id)}>
-                                <HeartIcon />
+                            <Button
+                                style={{
+                                    background: "none",
+                                    boxShadow: "none",
+                                    border: "none", // Removes the border
+                                }}
+                                radius="full"
+                                variant="ghost"
+                                isIconOnly
+                                aria-label="Like"
+                                onPress={() => handleLike(post._id)}
+                            >
+                                <HeartIcon
+                                    filled={likes[post._id] || false}
+                                    fill={likes[post._id] ? "red" : "currentColor"}
+                                />
+                            </Button>
+                            <Button
+                                style={{
+                                    background: "none",
+                                    boxShadow: "none",
+                                    border: "none", // Removes the border
+                                }}
+                                radius="full"
+                                variant="ghost"
+                                isIconOnly aria-label="Comments">
+                                <CommentsIcon filled={false} />
+                            </Button>
+                            <Button
 
-                            </Button>
-                            <Button isIconOnly aria-label="Comments" color="danger">
-                                <CommentsIcon />
-                            </Button>
-                            <Button isIconOnly aria-label="Share" color="danger">
+                                style={{
+                                    background: "none",
+                                    boxShadow: "none",
+                                    border: "none", // Removes the border
+                                }}
+                                radius="full"
+                                variant="ghost"
+                                isIconOnly aria-label="Share">
                                 <ShareIcon />
                             </Button>
                         </CardFooter>
-
-                        {
-                            post.likes.length > 0 && (
-                                <p className="px-4">
-                                    {post.likes.length} like{post.likes.length > 1 ? "s" : ""}
-                                </p>
-                            )
-                        }
-
-
+                        {likesCount[post._id] > 0 && (
+                            <p className="px-4">
+                                {likesCount[post._id]} like{likesCount[post._id] > 1 ? "s" : ""}
+                            </p>
+                        )}
                         <p className="p-4">{post.content}</p>
-
                     </Card>
                 ))
             ) : (
                 <Card className="w-auto space-y-5 p-4" radius="lg">
-                    <div className="w-80  flex items-center gap-3">
-                        <div>
-                            <Skeleton className="flex rounded-full w-12 h-12" />
-                        </div>
-                        <div className="w-full flex flex-col gap-2">
-                            <Skeleton className="h-3 w-3/5 rounded-lg" />
-                            <Skeleton className="h-3 w-4/5 rounded-lg" />
-                        </div>
-                    </div>
-                    <Skeleton className="rounded-lg">
-                        <div className="h-48 rounded-lg bg-default-300" />
-                    </Skeleton>
-                    <div className="space-y-3 ">
-                        <Skeleton className="w-3/5 rounded-lg">
-                            <div className="h-3 w-3/5 rounded-lg bg-default-200" />
-                        </Skeleton>
-                        <Skeleton className="w-4/5 rounded-lg">
-                            <div className="h-3 w-4/5 rounded-lg bg-default-200" />
-                        </Skeleton>
-                        <Skeleton className="w-2/5 rounded-lg">
-                            <div className="h-3 w-2/5 rounded-lg bg-default-300" />
-                        </Skeleton>
-                    </div>
+                    <Skeleton className="flex rounded-full w-12 h-12" />
+                    <Skeleton className="rounded-lg h-48" />
+                    <Skeleton className="h-3 w-4/5 rounded-lg" />
                 </Card>
             )}
         </div>

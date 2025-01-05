@@ -22,7 +22,7 @@ export const POST = async (req) => {
             const token = generateToken({ userId, email, name: user.name });
 
             return NextResponse.json(
-                { message: "Login Successful", token },
+                { message: "Login Successful", token, userId },
                 { status: 200 }
             );
         }
