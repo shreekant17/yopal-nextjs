@@ -22,6 +22,7 @@ export async function GET() {
         },
         {
             $project: {
+                _id: 1,
                 email: 1,
                 content: 1,
                 media: 1,
@@ -31,6 +32,7 @@ export async function GET() {
                 isEdited: 1,
                 comments: 1,
                 createdAt: 1,
+
                 "user.name": 1, // Include only the name field from the User collection
                 "user.avatar": 1, // Include only the avatar field from the User collection
             },

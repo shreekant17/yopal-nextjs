@@ -28,7 +28,11 @@ type Post = {
     user: User;
     media: string;  // Added the media property (post image)
     content: string; // Added content property for the post content
+    _id: string;
+    likes: string[];
 };
+
+
 
 const Feed = () => {
     const [posts, setPosts] = React.useState<Post[]>([]); // Explicitly typing the posts state
@@ -45,6 +49,28 @@ const Feed = () => {
             console.error("Error fetching posts:", error);
         }
     };
+
+    const handleLike = async (postId: string) => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            try {
+                const response = await fetch("/api/like", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ postId: postId, token: token }),
+                });
+                if (response.ok) {
+
+                    const data = await response.json();
+
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    }
 
     // Fetch posts when the component mounts
     useEffect(() => {
@@ -78,10 +104,11 @@ const Feed = () => {
                             />
                         </CardBody>
                         <Divider />
-                        <p className="p-4">{post.content}</p>
+
                         <CardFooter className="flex gap-3">
-                            <Button isIconOnly aria-label="Like" color="danger">
-                                <HeartFilledIcon />
+                            <Button isIconOnly aria-label="Like" color="danger" onPress={() => handleLike(post._id)}>
+                                <HeartIcon />
+
                             </Button>
                             <Button isIconOnly aria-label="Comments" color="danger">
                                 <CommentsIcon />
@@ -90,6 +117,18 @@ const Feed = () => {
                                 <ShareIcon />
                             </Button>
                         </CardFooter>
+
+                        {
+                            post.likes.length > 0 && (
+                                <p className="px-4">
+                                    {post.likes.length} like{post.likes.length > 1 ? "s" : ""}
+                                </p>
+                            )
+                        }
+
+
+                        <p className="p-4">{post.content}</p>
+
                     </Card>
                 ))
             ) : (
