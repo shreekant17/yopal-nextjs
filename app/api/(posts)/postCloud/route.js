@@ -1,11 +1,18 @@
+
 import { NextResponse } from "next/server";
-import path from "path";
-import { writeFile } from "fs/promises";
+import { v2 as cloudinary } from "cloudinary";
 import { verifyToken } from "@/libs/jwt";
 import Post from "@/models/postSchema";
 import connectMongoDB from "@/libs/db";
-export const POST = async (req) => {
 
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+export const POST = async (req) => {
     const formData = await req.formData();
 
     const file = formData.get("file");
@@ -13,38 +20,51 @@ export const POST = async (req) => {
         return NextResponse.json({ error: "No files received." }, { status: 400 });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const filename = file.name.replaceAll(" ", "_");
-    console.log(filename);
     try {
-        await writeFile(
-            path.join(process.cwd(), "/tmp/" + filename),
-            buffer
-        );
-        console.log(formData.get('token'));
-        const token = formData.get('token');
+        // Convert file to buffer
+        const buffer = Buffer.from(await file.arrayBuffer());
+
+        // Upload to Cloudinary
+        const uploadResponse = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+                { folder: "posts" },
+                (error, result) => {
+                    if (error) {
+                        reject(new Error(`Cloudinary Upload Error: ${error.message}`));
+                    } else {
+                        resolve(result);
+                    }
+                }
+            );
+            uploadStream.end(buffer);
+        });
+
+        // Extract uploaded file URL
+        const mediaUrl = uploadResponse.secure_url;
+
+        // Token verification and database save (optional)
+        const token = formData.get("token");
         if (token) {
             const user = verifyToken(token);
-            console.log(user);
             const email = user.email;
-            const content = formData.get('content');
-            const type = formData.get('type');
-            const media = filename;
+            const content = formData.get("content");
+            const type = formData.get("type");
 
             const post = {
                 email: email,
                 content: content,
                 type: type,
-                media: media,
-            }
-            //await connectMongoDB();
-            //await Post.create(post);
+                media: mediaUrl,
+            };
+
+
+            await connectMongoDB();
+            await Post.create(post);
         }
-        return NextResponse.json({ Message: "Success", media:media, status: 201 });
+
+        return NextResponse.json({ Message: "Success", status: 201 });
     } catch (error) {
-        console.log("Error occured ", error);
+        console.error("Error occurred:", error);
         return NextResponse.json({ Message: "Failed", status: 500 });
     }
-
-
 };
