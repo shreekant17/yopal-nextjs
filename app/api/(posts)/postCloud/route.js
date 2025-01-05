@@ -12,7 +12,7 @@ cloudinary.config({
 export async function POST(request) {
     const formData = await request.formData();
     const file = formData.get('file');
-
+    return NextResponse.json({ cloudname: process.env.CLOUDINARY_CLOUD_NAME }, { status: 200 });
     if (!file) {
         return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
