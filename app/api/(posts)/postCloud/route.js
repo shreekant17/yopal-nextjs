@@ -1,4 +1,5 @@
-
+import fs from "fs";
+import path from "path";
 import { NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 import { verifyToken } from "@/libs/jwt";
@@ -13,44 +14,33 @@ cloudinary.config({
 });
 
 export const POST = async (req) => {
-    try{
-        const formData = await req.formData();
-        const file = formData.get("file");
-        if (!file) {
-            return NextResponse.json({ error: "No files received." }, { status: 400 });
-        }
-        // Convert file to buffer
+    const formData = await req.formData();
+    const file = formData.get("file");
+    if (!file) {
+        return NextResponse.json({ error: "No files received." }, { status: 400 });
+    }
+
+    try {
+        // Save file temporarily
+        const tempDir = path.join(process.cwd(), "temp");
+        if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
+
+        const tempFilePath = path.join(tempDir, file.name);
         const buffer = Buffer.from(await file.arrayBuffer());
+        fs.writeFileSync(tempFilePath, buffer);
 
         // Upload to Cloudinary
-        const uploadResponse = await new Promise((resolve, reject) => {
-            const uploadStream = cloudinary.uploader.upload_stream(
-                { folder: "posts" },
-                (error, result) => {
-                    if (error) {
-                        reject(new Error(`Cloudinary Upload Error: ${error.message}`));
-                    } else {
-                        resolve(result);
-                    }
-                }
-            );
-            uploadStream.end(buffer);
+        const uploadResponse = await cloudinary.uploader.upload(tempFilePath, {
+            folder: "posts",
         });
 
         // Extract uploaded file URL
         const mediaUrl = uploadResponse.secure_url;
-        
-        return NextResponse.json({ Message: "Success Test", status: 201 });
-    }catch(err){
-        return NextResponse.json({ Message:err, status: 201 });
-    }
-    
 
-    try {
-        
+        // Delete temporary file
+        fs.unlinkSync(tempFilePath);
 
-        // Token verification and database save (optional)
-        /*
+        // Handle token verification and save post details
         const token = formData.get("token");
         if (token) {
             const user = verifyToken(token);
@@ -65,12 +55,11 @@ export const POST = async (req) => {
                 media: mediaUrl,
             };
 
-            
-            //await connectMongoDB();
-            //await Post.create(post);
+            await connectMongoDB();
+            await Post.create(post);
         }
-*/
-        return NextResponse.json({ Message: "Success", status: 201 });
+
+        return NextResponse.json({ Message: "Success", mediaUrl: mediaUrl, status: 201 });
     } catch (error) {
         console.error("Error occurred:", error);
         return NextResponse.json({ Message: "Failed", status: 500 });
