@@ -24,10 +24,7 @@ export const POST = async (req) => {
     var encoding = 'base64';
     var base64Data = Buffer.from(fileBuffer).toString('base64');
     var fileUri = 'data:' + mime + ';' + encoding + ',' + base64Data;
-    return NextResponse.json(
-            { success: true, fileUri: fileUri },
-            { status: 200 }
-        );
+    
     try {
 
         const uploadToCloudinary = () => {
