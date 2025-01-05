@@ -13,7 +13,7 @@ cloudinary.config({
 });
 
 export const POST = async (req) => {
-    return NextResponse.json({ Message: "Success Test", status: 201 });
+    
     const formData = await req.formData();
 
     const file = formData.get("file");
@@ -59,8 +59,8 @@ export const POST = async (req) => {
             };
 
 
-            await connectMongoDB();
-            await Post.create(post);
+            //await connectMongoDB();
+            //await Post.create(post);
         }
 
         return NextResponse.json({ Message: "Success", status: 201 });
