@@ -64,6 +64,6 @@ export const POST = async (req) => {
         return NextResponse.json({ Message: "Success", mediaUrl: mediaUrl, status: 201 });
     } catch (error) {
         console.error("Error occurred:", error);
-        return NextResponse.json({ Message: "Failed", error, key = process.env.CLOUDINARY_API_KEY, status: 500 });
+        return NextResponse.json({ Message: "Failed", error, key : process.env.CLOUDINARY_API_KEY, status: 500 });
     }
 };
