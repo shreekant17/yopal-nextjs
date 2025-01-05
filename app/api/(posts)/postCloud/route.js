@@ -55,8 +55,8 @@ export const POST = async (req) => {
                 media: mediaUrl,
             };
 
-            await connectMongoDB();
-            await Post.create(post);
+            //await connectMongoDB();
+           //await Post.create(post);
         }
 
         return NextResponse.json({ Message: "Success", mediaUrl: mediaUrl, status: 201 });
