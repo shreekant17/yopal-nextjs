@@ -65,11 +65,11 @@ export const POST = async (req) => {
                 media: mediaUrl,
             };
 
-            */
+            
             //await connectMongoDB();
             //await Post.create(post);
         }
-
+*/
         return NextResponse.json({ Message: "Success", status: 201 });
     } catch (error) {
         console.error("Error occurred:", error);
