@@ -19,12 +19,15 @@ export const POST = async (req) => {
     const data = await req.formData();
     const image = await data.get("file");
     const fileBuffer = await image.arrayBuffer();
-
+    
     var mime = image.type;
     var encoding = 'base64';
     var base64Data = Buffer.from(fileBuffer).toString('base64');
     var fileUri = 'data:' + mime + ';' + encoding + ',' + base64Data;
-
+    return NextResponse.json(
+            { success: true, fileUri: fileUri },
+            { status: 200 }
+        );
     try {
 
         const uploadToCloudinary = () => {
