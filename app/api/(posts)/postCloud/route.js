@@ -30,7 +30,11 @@ export const POST = async (req) => {
         // Upload to Cloudinary
         const uploadResponse = await cloudinary.uploader.upload(tempFilePath, {
             folder: "posts",
+            use_filename: true,
+            unique_filename: false,
+            resource_type: "auto",
         });
+
 
         // Extract uploaded file URL
         const mediaUrl = uploadResponse.secure_url;
