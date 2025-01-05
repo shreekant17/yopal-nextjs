@@ -72,7 +72,7 @@ const Feed = () => {
                                 isZoomed
                                 alt={"Post image"}
                                 className="object-cover rounded-xl"
-                                src={"posts/" + post.media}
+                                src={post.media}
                                 width={500}
                             />
                         </CardBody>
