@@ -19,13 +19,6 @@ export const POST = async (req) => {
         if (!file) {
             return NextResponse.json({ error: "No files received." }, { status: 400 });
         }
-        return NextResponse.json({ Message: "Success Test", status: 201 });
-    }catch(err){
-        return NextResponse.json({ Message:err, status: 201 });
-    }
-    
-
-    try {
         // Convert file to buffer
         const buffer = Buffer.from(await file.arrayBuffer());
 
@@ -46,8 +39,18 @@ export const POST = async (req) => {
 
         // Extract uploaded file URL
         const mediaUrl = uploadResponse.secure_url;
+        
+        return NextResponse.json({ Message: "Success Test", status: 201 });
+    }catch(err){
+        return NextResponse.json({ Message:err, status: 201 });
+    }
+    
+
+    try {
+        
 
         // Token verification and database save (optional)
+        /*
         const token = formData.get("token");
         if (token) {
             const user = verifyToken(token);
@@ -62,7 +65,7 @@ export const POST = async (req) => {
                 media: mediaUrl,
             };
 
-
+            */
             //await connectMongoDB();
             //await Post.create(post);
         }
