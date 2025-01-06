@@ -113,10 +113,10 @@ const Feed: React.FC = () => {
     }, []);
 
     return (
-        <div className="flex flex-col justify-center items-center gap-5">
+        <div className="flex flex-col justify-center items-center gap-5 p-0">
             {posts.length > 0 ? (
                 posts.map((post) => (
-                    <Card key={post._id} className="w-auto">
+                    <Card radius="none" key={post._id} className="w-auto">
                         <CardHeader className="flex gap-3">
                             <User
                                 avatarProps={{ src: post.user.avatar }}
@@ -129,13 +129,12 @@ const Feed: React.FC = () => {
                             />
                         </CardHeader>
                         <Divider />
-                        <CardBody className="overflow-visible py-2">
+                        <CardBody className="overflow-visible p-0">
                             <Image
-                                isZoomed
+                                radius="none"
                                 alt="Post image"
-                                className="object-cover rounded-xl"
+                                className="object-cover lg:w-[500px]"
                                 src={post.media}
-                                width={500}
                             />
                         </CardBody>
                         <Divider />
@@ -182,15 +181,15 @@ const Feed: React.FC = () => {
                             </Button>
                         </CardFooter>
                         {likesCount[post._id] > 0 && (
-                            <p className="px-4">
+                            <p className="px-4 text-xs">
                                 {likesCount[post._id]} like{likesCount[post._id] > 1 ? "s" : ""}
                             </p>
                         )}
-                        <p className="p-4">{post.content}</p>
+                        <p className="text-xs p-4">{post.content}</p>
                     </Card>
                 ))
             ) : (
-                <Card className="w-auto space-y-5 p-4" radius="lg">
+                <Card radius="none" className="w-auto space-y-5 p-4" >
                     <div className="w-80  flex items-center gap-3">
                         <div>
                             <Skeleton className="flex rounded-full w-12 h-12" />

@@ -1,4 +1,7 @@
 "use client";
+
+import { useState } from "react";
+import { useEffect } from "react";
 import {
   Navbar as NextUINavbar,
   NavbarContent,
@@ -29,9 +32,20 @@ import {
 import UploadPost from "./UploadPost";
 import { PlusIcon } from "./PlusIcon";
 import { Image } from "@nextui-org/react";
+import { UserIcon } from "./UserIcon";
+import { ExitIcon } from "./ExitIcon";
+import { LoginIcon } from "./LoginIcon";
+
+
 export const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [token, setToken] = useState<string>("");
 
+  useEffect(() => {
+    const token = localStorage.getItem("token") || "";
+    setToken(token);
+
+  }, []);
 
   const searchInput = (
     <Input
@@ -116,6 +130,13 @@ export const Navbar = () => {
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
 
         <ThemeSwitch />
+        {
+          token ? (
+            <ExitIcon />
+          ) : (
+            <LoginIcon />
+          )
+        }
         <Button isIconOnly aria-label="Share" color="danger" onPress={onOpen}>
           <PlusIcon />
         </Button>
