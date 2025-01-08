@@ -51,6 +51,7 @@ const UploadPost = ({ isOpen, onClose }: UploadPostProps) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string); // Set the image preview URL
+
       };
       reader.readAsDataURL(file); // Read the file as data URL
       setBtnStatus(false);
@@ -143,11 +144,7 @@ const UploadPost = ({ isOpen, onClose }: UploadPostProps) => {
 
                 </div>
 
-                {submitted && (
-                  <div className="text-small text-default-500 mt-4">
-                    Submitted data: <pre>{JSON.stringify(submitted, null, 2)}</pre>
-                  </div>
-                )}
+
               </Form>
             </ModalBody>
             <ModalFooter>

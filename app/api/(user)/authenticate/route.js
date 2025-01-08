@@ -15,7 +15,7 @@ export async function GET(req, res) {
             try {
                 const user = verifyToken(jwtToken);
                 await connectMongoDB();
-                const account = await User.findOne({ email: user.email });
+                const account = await User.findOne({ email: user.email }, { password: 0 });
 
                 if (account) {
 
@@ -28,7 +28,7 @@ export async function GET(req, res) {
 
             return NextResponse.json({ message: "ERROR" }, { status: 500 });
         } else {
-            return NextResponse.json({ message: "ERROR" }, { status: 500 });
+            return NextResponse.json({ message: "ERROR" }, { status: 401 });
         }
 
     } catch (err) {

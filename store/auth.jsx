@@ -16,14 +16,13 @@ export const AuthProvider = ({ children }) => {
     const userAuthentication = async () => {
        
             try {
-                const response = await fetch("/api/user", {
+                const response = await fetch("/api/authenticate", {
                     method: "GET",
                 });
     
                 if (response.ok) {
 
                     const result = await response.json();
-                    
                     const email = result.user.email;
                     const password = result.user.password;
 
@@ -41,7 +40,7 @@ export const AuthProvider = ({ children }) => {
                         } else {
                             //console.log("Authentication Passes");
                             setIsLoggedIn(true);
-                            router.push("/feed");
+                            //router.push("/feed");
                         }
             
                     } catch (err) {
@@ -63,9 +62,6 @@ export const AuthProvider = ({ children }) => {
         userAuthentication();
     }, []);
 
-    const logOut = () => {
-
-    }
 
 
     return (<AuthContext.Provider value={{ isLoggedIn }}>

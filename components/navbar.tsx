@@ -1,5 +1,7 @@
 "use client";
 
+
+import { Avatar } from "@nextui-org/react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useRouter } from 'next/navigation';
@@ -39,11 +41,25 @@ import { LoginIcon } from "./LoginIcon";
 import { useSession } from "next-auth/react"
 import { signOut } from "next-auth/react";
 import { Router } from "next/router";
+import { SessionUser } from "@/types";
+import { UserSession } from "@/types";
+import React from "react";
+
 
 export const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-
+  const [fname, setFname] = useState<string>("");
+  const [avatar, setAvatar] = useState<string>("/icon.png");
   const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (session) {
+
+      const { fname, avatar } = session?.user as SessionUser;
+      setFname(fname || "")
+    }
+
+  }, [session]);
 
 
   const router = useRouter();
@@ -115,16 +131,32 @@ export const Navbar = () => {
         </NavbarItem>
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
         <NavbarItem className="hidden md:flex">
-          <Button
-            isExternal
-            as={Link}
-            className="text-sm font-normal text-default-600 bg-default-100"
-            href={siteConfig.links.sponsor}
-            startContent={<HeartFilledIcon className="text-danger" />}
-            variant="flat"
-          >
-            Sponsor
-          </Button>
+          {
+            status === "authenticated" ? (
+              <Button
+                as={Link}
+                className="text-sm font-normal text-default-600 bg-default-100"
+                href={"/account"}
+                startContent={<Avatar size="md" src={avatar} />}
+                variant="flat"
+              >
+                {fname}
+              </Button>
+
+            ) : (
+              <Button
+
+                as={Link}
+                className="text-sm font-normal text-default-600 bg-default-100"
+                href={"/login"}
+                startContent={<UserIcon />}
+                variant="flat"
+              >
+                Sign In
+              </Button>
+            )
+          }
+
         </NavbarItem>
       </NavbarContent>
 
@@ -162,6 +194,7 @@ export const Navbar = () => {
 
             >
               <UserIcon />
+
             </Button>
           )
         }

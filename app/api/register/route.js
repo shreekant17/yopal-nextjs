@@ -8,7 +8,7 @@ export const POST = async (req) => {
     try {
         const userData = await req.json();
 
-        if (!userData.name || !userData.email || !userData.password || !userData.country) {
+        if (!userData.fname || !userData.email || !userData.password || !userData.country) {
             return NextResponse.json(
                 { message: "All fields are required" },
                 { status: 400 }

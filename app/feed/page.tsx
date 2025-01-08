@@ -24,7 +24,7 @@ import { useSession } from "next-auth/react";
 type User = {
     avatar: string;
     email: string;
-    name: string;
+    fname: string;
 };
 
 type Post = {
@@ -35,9 +35,9 @@ type Post = {
     likes: string[];
 };
 
-interface SessionUser {
+export interface SessionUser {
     id: string;
-    name?: string; // Other properties, if applicable
+    fname?: string; // Other properties, if applicable
 }
 
 const Feed: React.FC = () => {
@@ -54,6 +54,7 @@ const Feed: React.FC = () => {
             const response = await fetch("/api/fetchPosts", { method: "GET" });
             if (response.ok) {
                 const data = await response.json();
+
                 setPosts(data.posts || []);
 
                 // Initialize likes state and likesCount state based on fetched posts
@@ -130,10 +131,10 @@ const Feed: React.FC = () => {
                                 avatarProps={{ src: post.user.avatar }}
                                 description={
                                     <Link isExternal href={`mailto:${post.user.email}`} size="sm">
-                                        {post.user.name}
+                                        {post.user.fname}
                                     </Link>
                                 }
-                                name={post.user.name}
+                                name={post.user.fname}
                             />
                         </CardHeader>
                         <Divider />

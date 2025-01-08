@@ -33,7 +33,8 @@ export async function GET() {
                 comments: 1,
                 createdAt: 1,
 
-                "user.name": 1, // Include only the name field from the User collection
+                "user.fname": 1, // Include only the name field from the User collection
+                "user.lname": 1, // Include only the name field from the User collection
                 "user.avatar": 1, // Include only the avatar field from the User collection
             },
         },

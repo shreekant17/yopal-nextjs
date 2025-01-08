@@ -27,7 +27,7 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL || "/api/register";
 export default function App() {
     const [password, setPassword] = React.useState("");
     const [submitted, setSubmitted] = React.useState<{ [key: string]: string | File } | null>(null);
-    const [errors, setErrors] = React.useState<{ name?: string; email?: string; password?: string; terms?: string }>({});
+    const [errors, setErrors] = React.useState<{ fname?: string; email?: string; password?: string; terms?: string }>({});
     const router = useRouter();
 
     // Password validation
@@ -48,13 +48,13 @@ export default function App() {
             data[key] = value; // value is either string or File
         });
 
-        console.log("Form Data Submitted:", data);
+
 
         // Custom validation
         const newErrors: { [key: string]: string } = {};
 
-        if (data.name === "admin") {
-            newErrors.name = "Choose a different username";
+        if (data.fname === "admin") {
+            newErrors.fname = "Choose a different username";
         }
 
         // Handle password field (ensure it's a string)
@@ -126,11 +126,11 @@ export default function App() {
                                 isRequired
                                 errorMessage={({ validationDetails }) =>
                                     validationDetails.valueMissing
-                                        ? "Please enter your name"
-                                        : errors.name
+                                        ? "Please enter your first name"
+                                        : errors.fname
                                 }
                                 label="Name"
-                                name="name"
+                                name="fname"
 
                             />
 

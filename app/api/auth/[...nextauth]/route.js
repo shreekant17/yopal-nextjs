@@ -27,13 +27,21 @@ const authOptions = {
 
                 if (user && email === user.email && isMatch) {
                     const userId = user._id.toString();
-                    const jwtToken = generateToken({ userId, password, email, name: user.name });
+                    const jwtToken = generateToken({ userId, password, email, fname: user.fname });
                     if (remember) {
                         const cookieStore = await cookies();
                         cookieStore.set("token", jwtToken);
                     }
 
-                    return { ...user.toObject(), userId, jwtToken };
+                    return {
+                        ...user.toObject(),
+                        userId,
+                        jwtToken,
+                        fname: user.fname,
+                        lname: user.lname,
+                        avatar: user.avatar,
+                        jwtToken
+                    };
                 }
                 return null;
             },
@@ -59,8 +67,11 @@ const authOptions = {
 
             // For CredentialsProvider, store user data in the JWT token
             if (user) {
-                token.userId = user.userId; // Store the userId in the token
-                token.jwtToken = user.jwtToken; // Store the JWT token in the token
+                token.userId = user.userId;
+                token.jwtToken = user.jwtToken;
+                token.fname = user.fname;
+                token.lname = user.lname;
+                token.avatar = user.avatar;
             }
             return token;
         },
@@ -68,6 +79,9 @@ const authOptions = {
             // Add token info (userId, jwtToken) to the session
             session.user.id = token.userId;
             session.user.jwtToken = token.jwtToken;
+            session.user.fname = token.fname;
+            session.user.lname = token.lname;
+            session.user.avatar = token.avatar;
 
             return session;
         },
