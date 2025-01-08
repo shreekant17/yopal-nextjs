@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FormEvent } from 'react'
+import React, { FormEvent, useEffect } from 'react'
 import {
   Modal,
   ModalContent,
@@ -17,12 +17,20 @@ import {
   Radio
 } from "@nextui-org/react";
 import { toast } from 'react-toastify';
+import { useSession } from 'next-auth/react';
 
 // Typing for the props passed to the UploadPost component
 type UploadPostProps = {
   isOpen: boolean;
   onClose: () => void;
 };
+import { useState } from 'react';
+
+interface SessionUser {
+  id: string;
+  name?: string; // Other properties, if applicable
+  jwtToken: string;
+}
 
 const UploadPost = ({ isOpen, onClose }: UploadPostProps) => {
   const size = "lg";
@@ -31,6 +39,8 @@ const UploadPost = ({ isOpen, onClose }: UploadPostProps) => {
   const [btnStatus, setBtnStatus] = React.useState<boolean>(true);
   const [submitted, setSubmitted] = React.useState<any>(null);
   const [imagePreview, setImagePreview] = React.useState<string | null>(null);
+  const { data: session, status } = useSession();
+  const [token, setToken] = useState<string>("");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBtnStatus(true);
@@ -50,8 +60,8 @@ const UploadPost = ({ isOpen, onClose }: UploadPostProps) => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const token = localStorage.getItem("token");
-    console.log(token);
+
+
     if (token) {
       formData.append("token", token);
     }
@@ -72,6 +82,14 @@ const UploadPost = ({ isOpen, onClose }: UploadPostProps) => {
       toast.error("Error creating post");
     }
   };
+
+
+  useEffect(() => {
+    if (session) {
+      const token = (session?.user as SessionUser).jwtToken || "";
+      setToken(token);
+    }
+  }, [session]);
 
   return (
     <div>

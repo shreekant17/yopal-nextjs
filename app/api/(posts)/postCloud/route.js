@@ -67,11 +67,12 @@ export const POST = async (req) => {
             await connectMongoDB();
             await Post.create(post);
 
+            return NextResponse.json(
+                { success: true, imageUrl: imageUrl },
+                { status: 200 }
+            );
         }
-        return NextResponse.json(
-            { success: true, imageUrl: imageUrl },
-            { status: 200 }
-        );
+        return NextResponse.json({ err: "Unauthorized Error" }, { status: 500 });
     } catch (error) {
         console.log("server err", error);
         return NextResponse.json({ err: "Internal Server Error" }, { status: 500 });

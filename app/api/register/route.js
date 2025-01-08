@@ -2,6 +2,8 @@ import connectMongoDB from "@/libs/db";
 import User from "@/models/userSchema";
 import { NextResponse } from "next/server";
 
+import bcrypt from 'bcrypt';
+
 export const POST = async (req) => {
     try {
         const userData = await req.json();
@@ -23,6 +25,12 @@ export const POST = async (req) => {
                 { status: 400 }
             );
         }
+
+        const password = userData.password;
+        const saltRounds = 10;
+        const hashedPass = await bcrypt.hash(password, saltRounds);
+
+        userData.password = hashedPass;
 
         // Create new user
         const newUser = await User.create(userData);

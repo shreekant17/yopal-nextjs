@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useEffect } from "react";
+import { useRouter } from 'next/navigation';
 import {
   Navbar as NextUINavbar,
   NavbarContent,
@@ -15,7 +16,7 @@ import { Button } from "@nextui-org/button";
 import { Kbd } from "@nextui-org/kbd";
 import { Link } from "@nextui-org/link";
 import { Input } from "@nextui-org/input";
-import { link as linkStyles } from "@nextui-org/theme";
+import { button, link as linkStyles } from "@nextui-org/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
 import { useDisclosure } from '@nextui-org/react';
@@ -35,17 +36,17 @@ import { Image } from "@nextui-org/react";
 import { UserIcon } from "./UserIcon";
 import { ExitIcon } from "./ExitIcon";
 import { LoginIcon } from "./LoginIcon";
-
+import { useSession } from "next-auth/react"
+import { signOut } from "next-auth/react";
+import { Router } from "next/router";
 
 export const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [token, setToken] = useState<string>("");
 
-  useEffect(() => {
-    const token = localStorage.getItem("token") || "";
-    setToken(token);
+  const { data: session, status } = useSession();
 
-  }, []);
+
+  const router = useRouter();
 
   const searchInput = (
     <Input
@@ -106,9 +107,9 @@ export const Navbar = () => {
         justify="end"
       >
         <NavbarItem className="hidden sm:flex gap-2">
-
-          <PlusIcon onClick={onOpen} />
-
+          <Button isIconOnly onPress={onOpen}>
+            <PlusIcon />
+          </Button>
           <ThemeSwitch />
 
         </NavbarItem>
@@ -130,16 +131,49 @@ export const Navbar = () => {
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
 
         <ThemeSwitch />
+
         {
-          token ? (
-            <ExitIcon />
+          status === "authenticated" ? (
+            <Button
+              isIconOnly
+              onPress={async () => {
+                try {
+                  const response = await fetch("/api/logout", {
+                    method: "GET",
+                  });
+
+                  if (!response.ok) {
+                    return;
+                  }
+                  await signOut({ redirect: false });
+                } catch (error) {
+                  console.error('Error during sign-out or fetching user data:', error);
+                }
+              }}
+            >
+              <ExitIcon />
+            </Button>
           ) : (
-            <LoginIcon />
+            <Button
+              isIconOnly
+              onPress={() => {
+                router.push("/login");
+              }}
+
+            >
+              <UserIcon />
+            </Button>
           )
         }
-        <Button isIconOnly aria-label="Share" color="danger" onPress={onOpen}>
-          <PlusIcon />
-        </Button>
+
+        {
+          status === "authenticated" && (
+            <Button isIconOnly aria-label="Share" color="danger" onPress={onOpen}>
+              <PlusIcon />
+            </Button>
+          )
+        }
+
 
 
         <NavbarMenuToggle />

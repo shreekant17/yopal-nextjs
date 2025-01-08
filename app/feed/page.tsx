@@ -15,6 +15,10 @@ import {
 import { HeartIcon } from "@/components/HeartIcon";
 import { ShareIcon } from "@/components/ShareIcon";
 import { CommentsIcon } from "@/components/CommentsIcon";
+import { useSession } from "next-auth/react";
+
+
+
 
 // Define the types for User and Post
 type User = {
@@ -31,12 +35,18 @@ type Post = {
     likes: string[];
 };
 
+interface SessionUser {
+    id: string;
+    name?: string; // Other properties, if applicable
+}
+
 const Feed: React.FC = () => {
     const [posts, setPosts] = useState<Post[]>([]); // State for posts
     const [likes, setLikes] = useState<Record<string, boolean>>({}); // State for likes
     const [likesCount, setLikesCount] = useState<Record<string, number>>({}); // State for likes count
+    const { data: session, status } = useSession();
+
     const [userId, setUserId] = useState<string>("");
-    // Handle potential `null` gracefully
 
     // Function to fetch posts
     const getAllPosts = async (userId: string): Promise<void> => {
@@ -73,44 +83,42 @@ const Feed: React.FC = () => {
 
     // Function to handle liking a post
     const handleLike = async (postId: string): Promise<void> => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            try {
-                const response = await fetch("/api/like", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ postId, token }),
+
+        try {
+            const response = await fetch("/api/like", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ postId }),
+            });
+            if (response.ok) {
+                // Toggle like state locally
+                setLikes((prevLikes) => {
+                    const newLikes = { ...prevLikes, [postId]: !prevLikes[postId] };
+                    const newLikesCount = { ...likesCount };
+                    // Update likes count based on the toggle
+                    if (newLikes[postId]) {
+                        newLikesCount[postId] += 1; // Increment likes count
+                    } else {
+                        newLikesCount[postId] -= 1; // Decrement likes count
+                    }
+                    setLikesCount(newLikesCount); // Update likes count state
+                    return newLikes;
                 });
-                if (response.ok) {
-                    // Toggle like state locally
-                    setLikes((prevLikes) => {
-                        const newLikes = { ...prevLikes, [postId]: !prevLikes[postId] };
-                        const newLikesCount = { ...likesCount };
-                        // Update likes count based on the toggle
-                        if (newLikes[postId]) {
-                            newLikesCount[postId] += 1; // Increment likes count
-                        } else {
-                            newLikesCount[postId] -= 1; // Decrement likes count
-                        }
-                        setLikesCount(newLikesCount); // Update likes count state
-                        return newLikes;
-                    });
-                }
-            } catch (error) {
-                console.error("Error liking the post:", error);
             }
+        } catch (error) {
+            console.error("Error liking the post:", error);
         }
+
     };
 
     // Fetch posts when the component mounts
     useEffect(() => {
-        const storedUserId = localStorage.getItem("userId") || "";
+        const storedUserId = (session?.user as SessionUser)?.id || "";
         setUserId(storedUserId);
-        console.log(storedUserId);
         getAllPosts(storedUserId);
-    }, []);
+    }, [session]);
 
     return (
         <div className="flex flex-col justify-center items-center gap-5 p-0">
@@ -131,9 +139,10 @@ const Feed: React.FC = () => {
                         <Divider />
                         <CardBody className="overflow-visible p-0">
                             <Image
+
                                 radius="none"
                                 alt="Post image"
-                                className="object-cover lg:w-[500px]"
+                                className="object-cover lg:w-[500px] w-screen"
                                 src={post.media}
                             />
                         </CardBody>
@@ -189,7 +198,7 @@ const Feed: React.FC = () => {
                     </Card>
                 ))
             ) : (
-                <Card radius="none" className="w-auto space-y-5 p-4" >
+                <Card radius="none" className="w-screen lg:w-[500px] space-y-5 p-4" >
                     <div className="w-80  flex items-center gap-3">
                         <div>
                             <Skeleton className="flex rounded-full w-12 h-12" />

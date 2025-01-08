@@ -15,17 +15,17 @@ export const POST = async (req) => {
 
   const buffer = Buffer.from(await file.arrayBuffer());
   const filename = file.name.replaceAll(" ", "_");
-  console.log(filename);
+
   try {
     await writeFile(
       path.join(process.cwd(), "public/posts/" + filename),
       buffer
     );
-    console.log(formData.get('token'));
+
     const token = formData.get('token');
     if (token) {
       const user = verifyToken(token);
-      console.log(user);
+
       const email = user.email;
       const content = formData.get('content');
       const type = formData.get('type');
@@ -42,7 +42,7 @@ export const POST = async (req) => {
     }
     return NextResponse.json({ Message: "Success", status: 201 });
   } catch (error) {
-    console.log("Error occured ", error);
+
     return NextResponse.json({ Message: "Failed", status: 500 });
   }
 

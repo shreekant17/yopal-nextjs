@@ -21,12 +21,17 @@ import {
 } from "@nextui-org/react";
 
 import { toast } from 'react-toastify';
+import { signIn } from "next-auth/react";
+import { EyeFilledIcon, EyeSlashFilledIcon } from "@/components/icons";
+
 
 export default function App() {
     const [password, setPassword] = React.useState("");
     const [submitted, setSubmitted] = React.useState<{ [key: string]: string | File } | null>(null);
     const [errors, setErrors] = React.useState({});
     const router = useRouter();
+    const [isVisible, setIsVisible] = React.useState(false);
+    const toggleVisibility = () => setIsVisible(!isVisible);
 
     // Real-time password validation
     const getPasswordError = (value: string): string | undefined => {
@@ -46,7 +51,7 @@ export default function App() {
             data[key] = value; // value is either string or File
         });
 
-        console.log("Form Data Submitted:", data);
+        //console.log("Form Data Submitted:", data);
 
         // Custom validation checks
         const newErrors: { [key: string]: string } = {};
@@ -68,6 +73,7 @@ export default function App() {
         setErrors({});
         setSubmitted(data);
 
+        /*
         try {
             const response = await fetch("/api/login", {
                 method: "POST",
@@ -91,6 +97,31 @@ export default function App() {
         } catch (error) {
             console.error("Error:", error);
             toast.error("Something Went Wrong");
+        }
+        */
+        try {
+            const email = data.email;
+            const password = data.password;
+            const remember = data.remember;
+            const result = await signIn("credentials", {
+                email,
+                password,
+                remember,
+                redirect: false, // Prevent automatic redirect
+            });
+
+            if (result?.error) {
+                toast.error(result.error); // Handle error if authentication fails
+            } else {
+                // Redirect to a secure page (e.g., dashboard) on success
+
+                toast.success("Login Successfull");
+                router.push("/feed");
+
+            }
+
+        } catch (err) {
+
         }
     };
 
@@ -139,14 +170,36 @@ export default function App() {
                             />
                             <Input
                                 isRequired
-                                className="w-full" // Ensure the input field takes the full width
+                                className="w-full flex align-center" // Ensure the input field takes the full width
                                 errorMessage={getPasswordError(password)}
                                 isInvalid={!!getPasswordError(password)}
                                 label="Password"
                                 name="password"
-                                type="password"
+                                type={isVisible ? "text" : "password"}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                endContent={
+                                    <Button
+                                        aria-label="toggle password visibility"
+                                        className="focus:outline-none"
+                                        isIconOnly
+                                        type="button"
+                                        radius="full"
+                                        variant="ghost"
+                                        style={{
+                                            background: "none",
+                                            boxShadow: "none",
+                                            border: "none", // Removes the border
+                                        }}
+                                        onPress={toggleVisibility}
+                                    >
+                                        {isVisible ? (
+                                            <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                                        ) : (
+                                            <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                                        )}
+                                    </Button>
+                                }
                             />
                             <Checkbox
                                 isRequired
