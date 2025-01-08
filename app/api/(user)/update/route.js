@@ -16,16 +16,6 @@ export const POST = async (req) => {
     try {
         const data = await req.formData();
 
-        // Validate file
-        const image = data.get("file");
-        if (!image) {
-            return NextResponse.json({ success: false, error: "No image provided" }, { status: 400 });
-        }
-
-        // Convert file to Base64
-        const fileBuffer = await image.arrayBuffer();
-        const fileUri = `data:${image.type};base64,${Buffer.from(fileBuffer).toString("base64")}`;
-
         // Validate token
         const token = data.get("token");
         const user = verifyToken(token);
@@ -33,20 +23,28 @@ export const POST = async (req) => {
             return NextResponse.json({ success: false, error: "Invalid token" }, { status: 401 });
         }
 
-        // Upload image to Cloudinary
-        const result = await cloudinary.uploader.upload(fileUri, {
-            folder: "avatars",
-            invalidate: true,
-        });
-
-        const imageUrl = result.secure_url;
-
         // Validate required fields
         const requiredFields = ["id", "email", "fname", "lname", "country"];
         for (const field of requiredFields) {
             if (!data.get(field)) {
                 return NextResponse.json({ success: false, error: `${field} is required` }, { status: 400 });
             }
+        }
+
+        // Upload image to Cloudinary if file is provided
+        let imageUrl = null;
+        const image = data.get("file");
+        if (image) {
+            // Convert file to Base64
+            const fileBuffer = await image.arrayBuffer();
+            const fileUri = `data:${image.type};base64,${Buffer.from(fileBuffer).toString("base64")}`;
+
+            const result = await cloudinary.uploader.upload(fileUri, {
+                folder: "avatars",
+                invalidate: true,
+            });
+
+            imageUrl = result.secure_url;
         }
 
         // Update user in MongoDB
@@ -61,8 +59,12 @@ export const POST = async (req) => {
         existingUser.fname = data.get("fname");
         existingUser.lname = data.get("lname");
         existingUser.email = data.get("email");
-        existingUser.avatar = imageUrl;
         existingUser.country = data.get("country");
+
+        // Update avatar only if image is uploaded
+        if (imageUrl) {
+            existingUser.avatar = imageUrl;
+        }
 
         await existingUser.save();
 

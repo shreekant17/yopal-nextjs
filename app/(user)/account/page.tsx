@@ -82,7 +82,7 @@ export default function App() {
             const reader = new FileReader();
             reader.onloadend = () => {
                 setImagePreview(reader.result as string); // Set the image preview URL
-                console.log(imagePreview)
+
             };
             reader.readAsDataURL(file); // Read the file as data URL
 
@@ -96,7 +96,7 @@ export default function App() {
         const { jwtToken } = session?.user as SessionUser;
 
         if (jwtToken) {
-            console.log(jwtToken)
+
             formData.append("token", jwtToken);
         }
         const { id } = session?.user as SessionUser;
@@ -120,7 +120,7 @@ export default function App() {
         }
 
 
-        console.log(formData)
+
     };
 
     const getUserinfo = async (id: string) => {
@@ -135,7 +135,7 @@ export default function App() {
 
             if (response.ok) {
                 const result = await response.json();
-                console.log(result);
+
                 return result.account;
             } else {
                 const result = await response.json();
@@ -171,8 +171,8 @@ export default function App() {
                             </div>
 
                             <div className="flex flex-col">
-                                <p className="text-md">NextUI</p>
-                                <p className="text-small text-default-500">nextui.org</p>
+                                <p className="text-md">{userData.fname + " " + userData.lname}</p>
+                                <p className="text-small text-default-500">{userData.email}</p>
                             </div>
                         </div>
                         <Button size="md"
