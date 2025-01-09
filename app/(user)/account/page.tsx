@@ -17,12 +17,14 @@ import {
     Divider,
     Link,
     Image,
+    Slider,
 } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import { SessionUser } from "@/types/index";
 import { toast } from "react-toastify";
 
 export default function App() {
+
 
     const { isLoggedIn } = useAuth();
     const { logout } = useAuth();
@@ -231,6 +233,7 @@ export default function App() {
                                 value={userData.password}
                                 onChange={handleChange}
                             />
+
                             <Select
                                 className=""
                                 isRequired

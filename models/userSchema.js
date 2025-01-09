@@ -9,7 +9,11 @@ const userSchema = new mongoose.Schema({
   },
   lname: {
     type: String,
-
+    required: true,
+    trim: true,
+  },
+  gender: {
+    type: String,
     trim: true,
   },
   email: {

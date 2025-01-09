@@ -18,6 +18,7 @@ import {
     Divider,
     Link,
     Image,
+    Avatar,
 } from "@nextui-org/react";
 
 import { toast } from "react-toastify";
@@ -55,9 +56,7 @@ export default function App() {
         // Custom validation
         const newErrors: { [key: string]: string } = {};
 
-        if (data.fname === "admin") {
-            newErrors.fname = "Choose a different username";
-        }
+
 
         // Handle password field (ensure it's a string)
         const password = data.password as string;
@@ -130,13 +129,14 @@ export default function App() {
                         <div className="flex flex-col gap-6 w-full">
                             <Input
                                 isRequired
-                                errorMessage={({ validationDetails }) =>
-                                    validationDetails.valueMissing
-                                        ? "Please enter your first name"
-                                        : errors.fname
-                                }
-                                label="Name"
+                                label="Firstname"
                                 name="fname"
+
+                            />
+                            <Input
+                                isRequired
+                                label="Lastname"
+                                name="lname"
 
                             />
 
@@ -159,7 +159,6 @@ export default function App() {
                                 isInvalid={!!getPasswordError(password)}
                                 label="Password"
                                 name="password"
-
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
@@ -171,12 +170,72 @@ export default function App() {
                                 name="country"
 
                             >
-                                <SelectItem value="ar">Argentina</SelectItem>
-                                <SelectItem value="au">Australia</SelectItem>
-                                <SelectItem value="ca">Canada</SelectItem>
-                                <SelectItem value="in">India</SelectItem>
-                                <SelectItem value="us">United States</SelectItem>
-                                <SelectItem value="uk">United Kingdom</SelectItem>
+                                <SelectItem
+                                    key="argentina"
+                                    startContent={
+                                        <Avatar alt="Argentina" className="w-6 h-6" src="https://flagcdn.com/ar.svg" />
+                                    }
+                                >
+                                    Argentina
+                                </SelectItem>
+                                <SelectItem
+                                    key="venezuela"
+                                    startContent={
+                                        <Avatar alt="Venezuela" className="w-6 h-6" src="https://flagcdn.com/ve.svg" />
+                                    }
+                                >
+                                    Venezuela
+                                </SelectItem>
+                                <SelectItem
+                                    key="brazil"
+                                    startContent={<Avatar alt="Brazil" className="w-6 h-6" src="https://flagcdn.com/br.svg" />}
+                                >
+                                    Brazil
+                                </SelectItem>
+                                <SelectItem
+                                    key="switzerland"
+                                    startContent={
+                                        <Avatar alt="Switzerland" className="w-6 h-6" src="https://flagcdn.com/ch.svg" />
+                                    }
+                                >
+                                    Switzerland
+                                </SelectItem>
+                                <SelectItem
+                                    key="germany"
+                                    startContent={<Avatar alt="Germany" className="w-6 h-6" src="https://flagcdn.com/de.svg" />}
+                                >
+                                    Germany
+                                </SelectItem>
+                                <SelectItem
+                                    key="india"
+                                    startContent={<Avatar alt="India" className="w-6 h-6" src="https://flagcdn.com/in.svg" />}
+                                >
+                                    India
+                                </SelectItem>
+                                <SelectItem
+                                    key="spain"
+                                    startContent={<Avatar alt="Spain" className="w-6 h-6" src="https://flagcdn.com/es.svg" />}
+                                >
+                                    Spain
+                                </SelectItem>
+                                <SelectItem
+                                    key="france"
+                                    startContent={<Avatar alt="France" className="w-6 h-6" src="https://flagcdn.com/fr.svg" />}
+                                >
+                                    France
+                                </SelectItem>
+                                <SelectItem
+                                    key="italy"
+                                    startContent={<Avatar alt="Italy" className="w-6 h-6" src="https://flagcdn.com/it.svg" />}
+                                >
+                                    Italy
+                                </SelectItem>
+                                <SelectItem
+                                    key="mexico"
+                                    startContent={<Avatar alt="Mexico" className="w-6 h-6" src="https://flagcdn.com/mx.svg" />}
+                                >
+                                    Mexico
+                                </SelectItem>
                             </Select>
 
                             <Checkbox
