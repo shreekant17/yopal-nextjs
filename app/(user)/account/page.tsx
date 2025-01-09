@@ -37,51 +37,61 @@ export default function App() {
     });
 
     const [imagePreview, setImagePreview] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+
     const { data: session, status } = useSession();
 
 
     useEffect(() => {
-
-        if (!isLoggedIn) {
+        if (status === "loading") {
+            // Wait for session to load before checking the login status
+            return;
+        }
+        if (!session) {
             router.push("/login");
+        } else {
+
+            const fetchUserInfo = async () => {
+                if (session) {
+                    const { id } = session.user as SessionUser;
+
+                    try {
+                        const userInfo = await getUserInfo(id); // Await the result of getUserInfo
+
+                        if (userInfo) {
+                            const { fname, lname, email, avatar, country } = userInfo as SessionUser;
+
+                            setUserData((prevData) => ({
+                                ...prevData,
+                                fname: fname || prevData.fname,
+                                lname: lname || prevData.lname,
+                                email: email || prevData.email,
+                                country: country || prevData.country,
+                                avatar: avatar || prevData.avatar,
+                            }));
+
+
+                            console.log("Fetched user data:", userInfo);
+                        }
+                    } catch (error) {
+                        console.error("Failed to fetch user info:", error);
+                    }
+                }
+            };
+            fetchUserInfo(); // Call the async function
         }
 
-        const fetchUserInfo = async () => {
-            if (session) {
-                const { id } = session.user as SessionUser;
+    }, [session, status, router]);
 
-                try {
-                    const userInfo = await getUserInfo(id); // Await the result of getUserInfo
-                    if (userInfo) {
-                        const { fname, lname, email, avatar, country } = userInfo as SessionUser;
 
-                        setUserData((prevData) => ({
-                            ...prevData,
-                            fname: fname || prevData.fname,
-                            lname: lname || prevData.lname,
-                            email: email || prevData.email,
-                            country: country || prevData.country,
-                            avatar: avatar || prevData.avatar,
-                        }));
-
-                        //console.log("Fetched user data:", userInfo);
-                    }
-                } catch (error) {
-                    console.error("Failed to fetch user info:", error);
-                }
-            }
-        };
-
-        fetchUserInfo(); // Call the async function
-    }, [session, isLoggedIn]);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setUserData((prevData) => ({
             ...prevData,
             [name]: value,
         }));
     };
+
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files ? e.target.files[0] : null;
@@ -97,6 +107,7 @@ export default function App() {
     };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        setIsLoading(true);
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
 
@@ -107,6 +118,7 @@ export default function App() {
         const { id } = session?.user as SessionUser;
         formData.append("id", id);
 
+
         try {
             const res = await fetch("/api/update", {
                 method: "POST",
@@ -114,13 +126,16 @@ export default function App() {
             });
             if (res.ok) {
                 toast.success("Account Updated successfully!");
+                setIsLoading(false);
             } else {
                 const error = await res.json();
                 toast.error(error.Message);
+                setIsLoading(false);
             }
         } catch (error) {
             console.error("Upload error:", error);
             toast.error("Something Went Wrong");
+            setIsLoading(false);
         }
     };
 
@@ -147,9 +162,7 @@ export default function App() {
         }
     };
 
-    if (!isLoggedIn) {
-        return null; // Prevent rendering anything
-    }
+
 
 
     return (
@@ -218,7 +231,17 @@ export default function App() {
                                 value={userData.password}
                                 onChange={handleChange}
                             />
-                            <Select className="" isRequired label="Country" value={userData.country} name="country" selectionMode={"single"} onChange={() => handleChange}>
+                            <Select
+                                className=""
+                                isRequired
+                                label="Country"
+
+                                name="country"
+                                selectionMode={"single"}
+                                onChange={(e) => handleChange(e)} // Pass the event to 
+                                selectedKeys={[userData.country]}
+                            >
+
                                 <SelectItem
                                     key="argentina"
                                     startContent={
@@ -291,6 +314,7 @@ export default function App() {
 
 
                             <Button
+                                isLoading={isLoading}
                                 className="w-full bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg hover:shadow-xl"
                                 type="submit"
                             >

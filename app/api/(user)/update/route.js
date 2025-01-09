@@ -34,7 +34,8 @@ export const POST = async (req) => {
         // Upload image to Cloudinary if file is provided
         let imageUrl = null;
         const image = data.get("file");
-        if (image) {
+        console.log(image)
+        if (image && image instanceof File && image.size > 0) {
             // Convert file to Base64
             const fileBuffer = await image.arrayBuffer();
             const fileUri = `data:${image.type};base64,${Buffer.from(fileBuffer).toString("base64")}`;
@@ -60,6 +61,8 @@ export const POST = async (req) => {
         existingUser.lname = data.get("lname");
         existingUser.email = data.get("email");
         existingUser.country = data.get("country");
+
+        console.log(existingUser);
 
         // Update avatar only if image is uploaded
         if (imageUrl) {

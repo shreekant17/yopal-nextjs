@@ -26,6 +26,7 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL || "/api/register";
 
 export default function App() {
     const [password, setPassword] = React.useState("");
+    const [isLoading, setIsLoading] = React.useState(false);
     const [submitted, setSubmitted] = React.useState<{ [key: string]: string | File } | null>(null);
     const [errors, setErrors] = React.useState<{ fname?: string; email?: string; password?: string; terms?: string }>({});
     const router = useRouter();
@@ -39,6 +40,7 @@ export default function App() {
     };
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const data: { [key: string]: string | File } = {};
@@ -72,7 +74,7 @@ export default function App() {
             setErrors(newErrors);
             return;
         }
-
+        setIsLoading(true);
         // Clear errors and proceed with submission
         setErrors({});
         setSubmitted(data);
@@ -87,13 +89,17 @@ export default function App() {
             });
 
             if (response.ok) {
+                setIsLoading(false)
                 toast.success("Account created successfully");
                 router.push("/login");
+
             } else {
+                setIsLoading(false)
                 const result = await response.json();
                 toast.error(result.message);
             }
         } catch (error) {
+            setIsLoading(false)
             toast.error("Error creating account");
         }
     };

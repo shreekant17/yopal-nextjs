@@ -27,6 +27,7 @@ import { EyeFilledIcon, EyeSlashFilledIcon } from "@/components/icons";
 
 export default function App() {
     const [password, setPassword] = React.useState("");
+    const [isLoading, setIsLoading] = React.useState(false);
     const [submitted, setSubmitted] = React.useState<{ [key: string]: string | File } | null>(null);
     const [errors, setErrors] = React.useState({});
     const router = useRouter();
@@ -42,6 +43,7 @@ export default function App() {
     };
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        setIsLoading(true);
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const data: { [key: string]: string | File } = {};
@@ -73,32 +75,6 @@ export default function App() {
         setErrors({});
         setSubmitted(data);
 
-        /*
-        try {
-            const response = await fetch("/api/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            });
-
-            if (response.ok) {
-                const result = await response.json();
-                toast.success("Login Successful");
-                localStorage.setItem("token", `Bearer ${result.token}`);
-                localStorage.setItem("userId", result.userId);
-
-                router.push("/feed");
-            } else {
-                const result = await response.json();
-                toast.error(result.message);
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            toast.error("Something Went Wrong");
-        }
-        */
         try {
             const email = data.email;
             const password = data.password;
@@ -111,10 +87,11 @@ export default function App() {
             });
 
             if (result?.error) {
+                setIsLoading(false);
                 toast.error(result.error); // Handle error if authentication fails
             } else {
                 // Redirect to a secure page (e.g., dashboard) on success
-
+                setIsLoading(false);
                 toast.success("Login Successfull");
                 router.push("/feed");
 
@@ -212,6 +189,7 @@ export default function App() {
                             </Checkbox>
                             <div className="flex">
                                 <Button
+                                    isLoading={isLoading}
                                     className="w-full bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
                                     type="submit"
                                     radius="full"
