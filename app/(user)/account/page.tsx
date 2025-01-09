@@ -52,7 +52,7 @@ export default function App() {
                             avatar: avatar || prevData.avatar,
                         }));
 
-                        console.log("Fetched user data:", userInfo);
+                        //console.log("Fetched user data:", userInfo);
                     }
                 } catch (error) {
                     console.error("Failed to fetch user info:", error);
@@ -78,7 +78,7 @@ export default function App() {
             const reader = new FileReader();
             reader.onloadend = () => {
                 setImagePreview(reader.result as string); // Set the image preview URL
-                console.log("Image preview set to:", reader.result); // Debugging log
+                //"Image preview set to:", reader.result); // Debugging log
             };
             reader.readAsDataURL(file);
         }
@@ -124,7 +124,7 @@ export default function App() {
 
             if (response.ok) {
                 const result = await response.json();
-                console.log("User info fetched:", result.account); // Debugging log
+                //"User info fetched:", result.account); // Debugging log
                 return result.account;
             } else {
                 const errorResult = await response.json();
