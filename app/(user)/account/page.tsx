@@ -3,24 +3,22 @@
 import React, { FormEvent, useEffect, useState } from "react";
 import {
     Card,
+    CardBody,
+    CardHeader,
+    CardFooter,
     Button,
     Form,
     Input,
     Select,
     SelectItem,
-    Checkbox,
-    CardHeader,
-    CardBody,
-    CardFooter,
+    Avatar,
     Divider,
     Link,
-    Avatar,
-    Image
+    Image,
 } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import { SessionUser } from "@/types/index";
-import { link } from "fs";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 export default function App() {
     const [userData, setUserData] = useState({
@@ -29,20 +27,19 @@ export default function App() {
         email: "",
         password: "",
         country: "",
+        avatar: "", // Stores the avatar URL
     });
 
-    const [imagePreview, setImagePreview] = React.useState<string>("/icon.png");
-
+    const [imagePreview, setImagePreview] = useState("");
     const { data: session, status } = useSession();
 
     useEffect(() => {
         const fetchUserInfo = async () => {
             if (session) {
-
                 const { id } = session.user as SessionUser;
 
                 try {
-                    const userInfo = await getUserinfo(id); // Await the result of getUserinfo
+                    const userInfo = await getUserInfo(id); // Await the result of getUserInfo
                     if (userInfo) {
                         const { fname, lname, email, avatar, country } = userInfo as SessionUser;
 
@@ -52,8 +49,10 @@ export default function App() {
                             lname: lname || prevData.lname,
                             email: email || prevData.email,
                             country: country || prevData.country,
-
+                            avatar: avatar || prevData.avatar,
                         }));
+
+                        console.log("Fetched user data:", userInfo);
                     }
                 } catch (error) {
                     console.error("Failed to fetch user info:", error);
@@ -64,7 +63,6 @@ export default function App() {
         fetchUserInfo(); // Call the async function
     }, [session]);
 
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setUserData((prevData) => ({
@@ -74,18 +72,15 @@ export default function App() {
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-
         const file = e.target.files ? e.target.files[0] : null;
 
         if (file) {
-            // Create a preview URL for the selected file
             const reader = new FileReader();
             reader.onloadend = () => {
                 setImagePreview(reader.result as string); // Set the image preview URL
-
+                console.log("Image preview set to:", reader.result); // Debugging log
             };
-            reader.readAsDataURL(file); // Read the file as data URL
-
+            reader.readAsDataURL(file);
         }
     };
 
@@ -94,14 +89,11 @@ export default function App() {
         const formData = new FormData(e.currentTarget);
 
         const { jwtToken } = session?.user as SessionUser;
-
         if (jwtToken) {
-
             formData.append("token", jwtToken);
         }
         const { id } = session?.user as SessionUser;
-        formData.append("id", id)
-
+        formData.append("id", id);
 
         try {
             const res = await fetch("/api/update", {
@@ -115,17 +107,14 @@ export default function App() {
                 toast.error(error.Message);
             }
         } catch (error) {
-            //console.error("Upload error:", error);
+            console.error("Upload error:", error);
             toast.error("Something Went Wrong");
         }
-
-
-
     };
 
-    const getUserinfo = async (id: string) => {
+    const getUserInfo = async (id: string) => {
         try {
-            const response = await fetch("api/user", {
+            const response = await fetch("/api/user", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -135,16 +124,16 @@ export default function App() {
 
             if (response.ok) {
                 const result = await response.json();
-
+                console.log("User info fetched:", result.account); // Debugging log
                 return result.account;
             } else {
-                const result = await response.json();
-                console.log(result);
+                const errorResult = await response.json();
+                console.error("Error fetching user info:", errorResult);
             }
         } catch (error) {
-            console.log(error);
+            console.error("Error:", error);
         }
-    }
+    };
 
     return (
         <div className="flex justify-center items-center w-full">
@@ -154,11 +143,10 @@ export default function App() {
                         <div className="profile flex items-center gap-x-4">
                             <div className="avatar flex-col justify-center">
                                 <label htmlFor="file-input" className="cursor-pointer">
-
-
-                                    <Avatar
-                                        className="lg:w-32 lg:h-32 w-24 h-24 text-large"
-                                        src={imagePreview}
+                                    <Image
+                                        radius="full"
+                                        className="object-cover lg:w-32 lg:h-32 w-24 h-24 text-large opacity-100"
+                                        src={imagePreview || userData.avatar || undefined} // Use imagePreview or userData.avatar
                                     />
                                 </label>
                                 <Input
@@ -175,17 +163,12 @@ export default function App() {
                                 <p className="text-small text-default-500">{userData.email}</p>
                             </div>
                         </div>
-                        <Button size="md"
-                            color="danger"
-                            as={Link}
-
-                        >
+                        <Button size="md" color="danger" as={Link}>
                             Logout
                         </Button>
                     </CardHeader>
                     <Divider />
                     <CardBody>
-
                         <div className="flex flex-col gap-6 w-full">
                             <Input
                                 isRequired
@@ -203,11 +186,6 @@ export default function App() {
                             />
                             <Input
                                 isRequired
-                                errorMessage={({ validationDetails }) =>
-                                    validationDetails.valueMissing
-                                        ? "Please enter your email"
-                                        : "Please enter a valid email address"
-                                }
                                 label="Email"
                                 name="email"
                                 type="email"
@@ -223,7 +201,7 @@ export default function App() {
                                 value={userData.password}
                                 onChange={handleChange}
                             />
-                            <Select isRequired label="Country" name="country">
+                            <Select isRequired label="Country" name="country" value={userData.country}>
                                 <SelectItem value="ar">Argentina</SelectItem>
                                 <SelectItem value="au">Australia</SelectItem>
                                 <SelectItem value="ca">Canada</SelectItem>
@@ -239,21 +217,15 @@ export default function App() {
                                 Save
                             </Button>
                         </div>
-
                     </CardBody>
                     <Divider />
-
                     <CardFooter>
-                        <Link
-                            isExternal
-                            showAnchorIcon
-                            href=""
-                        >
+                        <Link isExternal showAnchorIcon href="">
                             Update at your own risk
                         </Link>
                     </CardFooter>
                 </Form>
             </Card>
-        </div >
+        </div>
     );
 }

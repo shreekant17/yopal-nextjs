@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signIn } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
+import React from 'react';
 
 
 export const AuthContext = createContext();
@@ -56,6 +57,20 @@ export const AuthProvider = ({ children }) => {
             }
         }
 
+    const logout = async () => {
+        try {
+            const response = await fetch("/api/logout", {
+            method: "GET",
+            });
+
+            if (!response.ok) {
+            return;
+            }
+            await signOut({ redirect: false });
+        } catch (error) {
+            console.error('Error during sign-out or fetching user data:', error);
+        }
+    }
     
 
     useEffect(() => {
@@ -64,7 +79,7 @@ export const AuthProvider = ({ children }) => {
 
 
 
-    return (<AuthContext.Provider value={{ isLoggedIn }}>
+    return (<AuthContext.Provider value={{ isLoggedIn, logout }}>
         {children}
     </AuthContext.Provider>
     );

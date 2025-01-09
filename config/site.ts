@@ -2,7 +2,7 @@ export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
   name: "Yo!Pal",
-  description: "Make beautiful connections regardless of your design experience.",
+  description: "Make beautiful connections regardless of your experience.",
   navItems: [
     {
       label: "Home",
@@ -54,10 +54,7 @@ export const siteConfig = {
       label: "Help & Feedback",
       href: "/help-feedback",
     },
-    {
-      label: "Logout",
-      href: "/logout",
-    },
+
   ],
   links: {
     github: "https://github.com/nextui-org/nextui",

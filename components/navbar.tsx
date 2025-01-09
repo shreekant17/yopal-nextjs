@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/store/auth";
 
 import { Avatar } from "@nextui-org/react";
 import { useState } from "react";
@@ -47,9 +48,10 @@ import React from "react";
 
 
 export const Navbar = () => {
+  const { logout } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [fname, setFname] = useState<string>("");
-  const [avatar, setAvatar] = useState<string>("/icon.png");
+  const [avatar, setAvatar] = useState<string>();
   const { data: session, status } = useSession();
 
   useEffect(() => {
@@ -57,6 +59,8 @@ export const Navbar = () => {
 
       const { fname, avatar } = session?.user as SessionUser;
       setFname(fname || "")
+      setAvatar(avatar || undefined);
+      console.log(avatar)
     }
 
   }, [session]);
@@ -137,7 +141,7 @@ export const Navbar = () => {
                 as={Link}
                 className="text-sm font-normal text-default-600 bg-default-100"
                 href={"/account"}
-                startContent={<Avatar size="md" src={avatar} />}
+                startContent={<Image radius="full" className="object-cover w-8 h-8 opacity-100" src={avatar} />}
                 variant="flat"
               >
                 {fname}
@@ -215,15 +219,33 @@ export const Navbar = () => {
       <NavbarMenu>
         {searchInput}
         <div className="mx-4 mt-2 flex flex-col gap-2">
+          <NavbarMenuItem>
+            <Link
+              size="lg"
+              href="/account"
+              color={
+                "foreground"
+              }
+            >
+              Account
+            </Link>
+          </NavbarMenuItem>
+          <NavbarMenuItem>
+            <Link
+              size="lg"
+              href="/feed"
+              color={
+                "foreground"
+              }
+            >
+              Feed
+            </Link>
+          </NavbarMenuItem>
           {siteConfig.navMenuItems.map((item, index) => (
             <NavbarMenuItem key={`${item}-${index}`}>
               <Link
                 color={
-                  index === 2
-                    ? "primary"
-                    : index === siteConfig.navMenuItems.length - 1
-                      ? "danger"
-                      : "foreground"
+                  "foreground"
                 }
                 href="#"
                 size="lg"
@@ -232,6 +254,16 @@ export const Navbar = () => {
               </Link>
             </NavbarMenuItem>
           ))}
+          <NavbarMenuItem>
+            <Link
+              color="danger"
+              onPress={logout}
+              size="lg"
+              href="#"
+            >
+              Logout
+            </Link>
+          </NavbarMenuItem>
         </div>
       </NavbarMenu>
     </NextUINavbar>
