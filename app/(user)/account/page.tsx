@@ -1,6 +1,8 @@
 "use client";
 
+import { useAuth } from "@/store/auth";
 import React, { FormEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
     Card,
     CardBody,
@@ -21,6 +23,10 @@ import { SessionUser } from "@/types/index";
 import { toast } from "react-toastify";
 
 export default function App() {
+
+    const { isLoggedIn } = useAuth();
+    const { logout } = useAuth();
+    const router = useRouter();;
     const [userData, setUserData] = useState({
         fname: "",
         lname: "",
@@ -33,7 +39,13 @@ export default function App() {
     const [imagePreview, setImagePreview] = useState("");
     const { data: session, status } = useSession();
 
+
     useEffect(() => {
+
+        if (!isLoggedIn) {
+            router.push("/login");
+        }
+
         const fetchUserInfo = async () => {
             if (session) {
                 const { id } = session.user as SessionUser;
@@ -61,7 +73,7 @@ export default function App() {
         };
 
         fetchUserInfo(); // Call the async function
-    }, [session]);
+    }, [session, isLoggedIn]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -135,17 +147,22 @@ export default function App() {
         }
     };
 
+    if (!isLoggedIn) {
+        return null; // Prevent rendering anything
+    }
+
+
     return (
         <div className="flex justify-center items-center w-full">
             <Card className="lg:w-1/2">
                 <Form className="p-2 w-full space-y-6" onSubmit={handleSubmit} encType="multipart/form-data">
-                    <CardHeader className="flex gap-3 justify-between px-12">
+                    <CardHeader className="flex gap-3 justify-between w-full">
                         <div className="profile flex items-center gap-x-4">
                             <div className="avatar flex-col justify-center">
                                 <label htmlFor="file-input" className="cursor-pointer">
                                     <Image
                                         radius="full"
-                                        className="object-cover lg:w-32 lg:h-32 w-24 h-24 text-large opacity-100"
+                                        className="object-cover lg:w-32 lg:h-32 w-16 h-16 opacity-100"
                                         src={imagePreview || userData.avatar || undefined} // Use imagePreview or userData.avatar
                                     />
                                 </label>
@@ -159,11 +176,11 @@ export default function App() {
                             </div>
 
                             <div className="flex flex-col">
-                                <p className="text-md">{userData.fname + " " + userData.lname}</p>
-                                <p className="text-small text-default-500">{userData.email}</p>
+                                <p className="text-small">{userData.fname + " " + userData.lname}</p>
+                                <p className="text-xs text-default-500">{userData.email}</p>
                             </div>
                         </div>
-                        <Button size="md" color="danger" as={Link}>
+                        <Button size="md" color="danger" onPress={logout}>
                             Logout
                         </Button>
                     </CardHeader>
@@ -201,14 +218,77 @@ export default function App() {
                                 value={userData.password}
                                 onChange={handleChange}
                             />
-                            <Select isRequired label="Country" name="country" value={userData.country}>
-                                <SelectItem value="ar">Argentina</SelectItem>
-                                <SelectItem value="au">Australia</SelectItem>
-                                <SelectItem value="ca">Canada</SelectItem>
-                                <SelectItem value="in">India</SelectItem>
-                                <SelectItem value="us">United States</SelectItem>
-                                <SelectItem value="uk">United Kingdom</SelectItem>
+                            <Select className="" isRequired label="Country" value={userData.country} name="country" selectionMode={"single"} onChange={() => handleChange}>
+                                <SelectItem
+                                    key="argentina"
+                                    startContent={
+                                        <Avatar alt="Argentina" className="w-6 h-6" src="https://flagcdn.com/ar.svg" />
+                                    }
+                                >
+                                    Argentina
+                                </SelectItem>
+                                <SelectItem
+                                    key="venezuela"
+                                    startContent={
+                                        <Avatar alt="Venezuela" className="w-6 h-6" src="https://flagcdn.com/ve.svg" />
+                                    }
+                                >
+                                    Venezuela
+                                </SelectItem>
+                                <SelectItem
+                                    key="brazil"
+                                    startContent={<Avatar alt="Brazil" className="w-6 h-6" src="https://flagcdn.com/br.svg" />}
+                                >
+                                    Brazil
+                                </SelectItem>
+                                <SelectItem
+                                    key="switzerland"
+                                    startContent={
+                                        <Avatar alt="Switzerland" className="w-6 h-6" src="https://flagcdn.com/ch.svg" />
+                                    }
+                                >
+                                    Switzerland
+                                </SelectItem>
+                                <SelectItem
+                                    key="germany"
+                                    startContent={<Avatar alt="Germany" className="w-6 h-6" src="https://flagcdn.com/de.svg" />}
+                                >
+                                    Germany
+                                </SelectItem>
+                                <SelectItem
+                                    key="india"
+                                    startContent={<Avatar alt="India" className="w-6 h-6" src="https://flagcdn.com/in.svg" />}
+                                >
+                                    India
+                                </SelectItem>
+                                <SelectItem
+                                    key="spain"
+                                    startContent={<Avatar alt="Spain" className="w-6 h-6" src="https://flagcdn.com/es.svg" />}
+                                >
+                                    Spain
+                                </SelectItem>
+                                <SelectItem
+                                    key="france"
+                                    startContent={<Avatar alt="France" className="w-6 h-6" src="https://flagcdn.com/fr.svg" />}
+                                >
+                                    France
+                                </SelectItem>
+                                <SelectItem
+                                    key="italy"
+                                    startContent={<Avatar alt="Italy" className="w-6 h-6" src="https://flagcdn.com/it.svg" />}
+                                >
+                                    Italy
+                                </SelectItem>
+                                <SelectItem
+                                    key="mexico"
+                                    startContent={<Avatar alt="Mexico" className="w-6 h-6" src="https://flagcdn.com/mx.svg" />}
+                                >
+                                    Mexico
+                                </SelectItem>
                             </Select>
+
+
+
 
                             <Button
                                 className="w-full bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg hover:shadow-xl"

@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/store/auth";
 
-import { Avatar } from "@nextui-org/react";
+import { Avatar, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useRouter } from 'next/navigation';
@@ -53,7 +53,7 @@ export const Navbar = () => {
   const [fname, setFname] = useState<string>("");
   const [avatar, setAvatar] = useState<string>();
   const { data: session, status } = useSession();
-
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   useEffect(() => {
     if (session) {
 
@@ -90,11 +90,11 @@ export const Navbar = () => {
   );
 
   return (
-    <NextUINavbar maxWidth="xl" position="sticky">
+    <NextUINavbar maxWidth="xl" position="sticky" isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
       <UploadPost isOpen={isOpen} onClose={onClose} />
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-1" href="/">
+          <NextLink className="flex justify-start items-center gap-1" href="/" onClick={() => setIsMenuOpen(false)}>
             <Image
 
               alt={"logo"}
@@ -137,15 +137,41 @@ export const Navbar = () => {
         <NavbarItem className="hidden md:flex">
           {
             status === "authenticated" ? (
-              <Button
-                as={Link}
-                className="text-sm font-normal text-default-600 bg-default-100"
-                href={"/account"}
-                startContent={<Image radius="full" className="object-cover w-8 h-8 opacity-100" src={avatar} />}
-                variant="flat"
-              >
-                {fname}
-              </Button>
+
+              <NavbarContent as="div" justify="end" className="hidden lg:flex">
+
+                <Dropdown placement="bottom-end">
+                  <DropdownTrigger>
+                    <Button
+
+                      className="text-sm font-normal text-default-600 bg-default-100"
+
+                      startContent={<Image radius="full" className="object-cover w-8 h-8 opacity-100" src={avatar} />}
+                      variant="flat"
+                    >
+                      {fname}
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu aria-label="Profile Actions" variant="flat">
+                    <DropdownItem key="profile" className="h-14 gap-2">
+                      <p className="font-semibold">Signed in as</p>
+                      <p className="font-semibold">zoey@example.com</p>
+                    </DropdownItem>
+                    <DropdownItem key="settings" as={Link} href={"/account"}>My Account</DropdownItem>
+                    <DropdownItem key="team_settings">Team Settings</DropdownItem>
+                    <DropdownItem key="analytics">Analytics</DropdownItem>
+                    <DropdownItem key="system">System</DropdownItem>
+                    <DropdownItem key="configurations">Configurations</DropdownItem>
+                    <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
+                    <DropdownItem key="logout" color="danger"
+
+                      onPress={logout}
+                    >
+                      Log Out
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              </NavbarContent>
 
             ) : (
               <Button
@@ -167,27 +193,26 @@ export const Navbar = () => {
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
 
         <ThemeSwitch />
+        {
+          status === "authenticated" && (
+            <Button isIconOnly aria-label="Share" color="danger" onPress={onOpen}>
+              <PlusIcon />
+            </Button>
+          )
+        }
 
         {
           status === "authenticated" ? (
             <Button
               isIconOnly
-              onPress={async () => {
-                try {
-                  const response = await fetch("/api/logout", {
-                    method: "GET",
-                  });
-
-                  if (!response.ok) {
-                    return;
-                  }
-                  await signOut({ redirect: false });
-                } catch (error) {
-                  console.error('Error during sign-out or fetching user data:', error);
-                }
-              }}
+              radius="full"
+              color="danger"
+              className="text-sm font-normal text-default-600 bg-default-100"
+              onPress={() => setIsMenuOpen(!isMenuOpen)}
+              startContent={<Image radius="full" className="object-cover w-8 h-8 opacity-100" src={avatar} />}
+              variant="flat"
             >
-              <ExitIcon />
+
             </Button>
           ) : (
             <Button
@@ -203,17 +228,12 @@ export const Navbar = () => {
           )
         }
 
-        {
-          status === "authenticated" && (
-            <Button isIconOnly aria-label="Share" color="danger" onPress={onOpen}>
-              <PlusIcon />
-            </Button>
-          )
-        }
 
 
 
-        <NavbarMenuToggle />
+
+
+
       </NavbarContent>
 
       <NavbarMenu>
@@ -226,17 +246,21 @@ export const Navbar = () => {
               color={
                 "foreground"
               }
+              onPress={() => setIsMenuOpen(false)}
+
             >
               Account
             </Link>
           </NavbarMenuItem>
           <NavbarMenuItem>
             <Link
+
               size="lg"
               href="/feed"
               color={
                 "foreground"
               }
+              onPress={() => setIsMenuOpen(false)}
             >
               Feed
             </Link>
@@ -257,15 +281,20 @@ export const Navbar = () => {
           <NavbarMenuItem>
             <Link
               color="danger"
-              onPress={logout}
               size="lg"
               href="#"
+              onPress={() => {
+                logout();
+                setIsMenuOpen(false);
+              }}
             >
               Logout
             </Link>
+
           </NavbarMenuItem>
         </div>
       </NavbarMenu>
+
     </NextUINavbar>
   );
 };

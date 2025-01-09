@@ -10,7 +10,7 @@ export const AuthContext = createContext();
 
 
 export const AuthProvider = ({ children }) => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState();
 
     const router = useRouter();
     
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
                         });
             
                         if (result?.error) {
-                            
+                            setIsLoggedIn(false)
                         } else {
                             //console.log("Authentication Passes");
                             setIsLoggedIn(true);
