@@ -12,6 +12,10 @@ import {
     User,
     Skeleton,
     useDisclosure,
+    Dropdown,
+    DropdownTrigger,
+    DropdownItem,
+    DropdownMenu,
 } from "@nextui-org/react";
 import { HeartIcon } from "@/components/HeartIcon";
 import { ShareIcon } from "@/components/ShareIcon";
@@ -19,6 +23,8 @@ import { CommentsIcon } from "@/components/CommentsIcon";
 import { useSession } from "next-auth/react";
 import CommentBox from "@/components/CommentBox";
 import { SessionUser } from "@/types";
+import { getRelativeTime } from "@/components/getRelativeTime";
+import { ThreeDots } from "@/components/ThreeDots";
 
 
 // Define the types for User and Post
@@ -26,6 +32,7 @@ type User = {
     avatar: string;
     email: string;
     fname: string;
+    _id: string;
 };
 
 type Post = {
@@ -33,6 +40,7 @@ type Post = {
     media: string;
     content: string;
     _id: string;
+    createdAt: string;
     likes: string[];
 };
 
@@ -128,16 +136,37 @@ const Feed: React.FC = () => {
             {posts.length > 0 ? (
                 posts.map((post) => (
                     <Card radius="none" key={post._id} className="w-auto">
-                        <CardHeader className="flex gap-3">
+                        <CardHeader className="flex gap-3 justify-between">
                             <User
                                 avatarProps={{ src: post.user.avatar }}
                                 description={
-                                    <Link isExternal href={`mailto:${post.user.email}`} size="sm">
-                                        {post.user.fname}
-                                    </Link>
+                                    getRelativeTime(post.createdAt)
                                 }
                                 name={post.user.fname}
                             />
+                            <Dropdown>
+                                <DropdownTrigger>
+                                    <Button
+                                        className="border-none"
+                                        radius="full"
+                                        isIconOnly variant="bordered">
+                                        <ThreeDots />
+                                    </Button>
+                                </DropdownTrigger>
+                                <DropdownMenu aria-label="Static Actions">
+                                    <DropdownItem key="shre">Share Post</DropdownItem>
+                                    <DropdownItem key="edit">Edit Post</DropdownItem>
+                                    {userId === post.user._id ? (
+                                        <DropdownItem key="delete" className="text-danger" color="danger">
+                                            Delete Post
+                                        </DropdownItem>
+
+                                    ) : (
+                                        <></>
+                                    )
+                                    }
+                                </DropdownMenu>
+                            </Dropdown>
                         </CardHeader>
                         <Divider />
                         <CardBody className="overflow-visible p-0">
@@ -152,11 +181,8 @@ const Feed: React.FC = () => {
                         <Divider />
                         <CardFooter className="flex gap-3">
                             <Button
-                                style={{
-                                    background: "none",
-                                    boxShadow: "none",
-                                    border: "none", // Removes the border
-                                }}
+
+                                className="border-none"
                                 radius="full"
                                 variant="ghost"
                                 isIconOnly
@@ -169,11 +195,7 @@ const Feed: React.FC = () => {
                                 />
                             </Button>
                             <Button
-                                style={{
-                                    background: "none",
-                                    boxShadow: "none",
-                                    border: "none", // Removes the border
-                                }}
+                                className="border-none"
                                 radius="full"
                                 variant="ghost"
                                 onPress={() => {
@@ -185,11 +207,7 @@ const Feed: React.FC = () => {
                             </Button>
                             <Button
 
-                                style={{
-                                    background: "none",
-                                    boxShadow: "none",
-                                    border: "none", // Removes the border
-                                }}
+                                className="border-none"
                                 radius="full"
                                 variant="ghost"
                                 isIconOnly aria-label="Share">

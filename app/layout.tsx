@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   icons: {
-    icon: "/icon.png",
+    icon: "/yplexity-transparent.png",
   },
 };
 

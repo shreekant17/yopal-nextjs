@@ -12,10 +12,12 @@ import {
     Input,
     User,
     ScrollShadow,
+    Textarea,
 } from "@nextui-org/react";
 import { toast } from "react-toastify";
 import { useSession } from "next-auth/react";
 import { SendIcon } from "@/components/SendIcon";
+import { getRelativeTime } from "@/components/getRelativeTime";
 
 // Typing for the props passed to the UploadPost component
 type CommentProps = {
@@ -112,7 +114,7 @@ const CommentBox = ({ isOpen, onClose, postId }: CommentProps) => {
 
     return (
         <div>
-            <Modal isOpen={isOpen} size={size} onClose={onClose}>
+            <Modal isOpen={isOpen} size={size} onClose={onClose} >
                 <ModalContent>
                     <>
                         <ModalHeader className="flex justify-start flex-col gap-1">Comments</ModalHeader>
@@ -120,16 +122,17 @@ const CommentBox = ({ isOpen, onClose, postId }: CommentProps) => {
                             <ModalBody className="h-full flex flex-col gap-4">
                                 {comments.length > 0 ? (
                                     comments.map((comment) => (
-                                        <div className="comment bg-default p-2 rounded-lg" key={comment.comments._id}>
+                                        <div className="comment lg:p-2  rounded-lg" key={comment.comments._id}>
                                             <div className="top flex justify-between items-center">
                                                 <User
                                                     avatarProps={{ src: comment.userDetails?.avatar || "" }}
-                                                    description={comment.comments.createdAt}
+                                                    description={getRelativeTime(comment.comments.createdAt)}
                                                     name={comment.userDetails?.fname || "Anonymous"}
                                                 />
 
                                             </div>
-                                            <p className="mt-2">{comment.comments.text || "No content"}</p>
+                                            <Textarea isReadOnly className=" w-full h-content  p-2 rounded-lg  text-sm " placeholder={comment.comments.text || "No content"} />
+
                                         </div>
                                     ))
                                 ) : (
@@ -137,24 +140,24 @@ const CommentBox = ({ isOpen, onClose, postId }: CommentProps) => {
                                 )}
                             </ModalBody>
                         </ScrollShadow>
-                        <Form className=" p-4 w-full space-y-4" onSubmit={handleSubmit}>
-                            <Input
-                                isRequired
-                                className="w-full"
-                                label="Write a comment..."
-                                name="commentText"
-                                type="text"
-                                endContent={
-                                    <Button isIconOnly radius="full" color="danger" type="submit">
-                                        <SendIcon />
-                                    </Button>
-                                }
-                            />
-                        </Form>
-                        <ModalFooter>
-                            <Button color="danger" variant="light" onPress={onClose}>
-                                Close
-                            </Button>
+                        <ModalFooter className="p-0">
+                            <Form className=" p-4 h-min w-full space-y-4" onSubmit={handleSubmit}>
+                                <Textarea
+                                    rows={1} // Ensures it starts with 1 row
+                                    minRows={1} // Prevents it from shrinking below 1 row
+                                    isRequired
+                                    className="w-full"
+                                    placeholder="Write a comment..."
+                                    name="commentText"
+                                    endContent={
+                                        <Button isIconOnly radius="full" color="danger" type="submit">
+                                            <SendIcon />
+                                        </Button>
+                                    }
+                                />
+
+                            </Form>
+
                         </ModalFooter>
                     </>
                 </ModalContent>

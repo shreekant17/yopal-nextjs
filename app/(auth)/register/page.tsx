@@ -109,15 +109,15 @@ export default function App() {
             <Card className="w-full max-w-lg p-6 shadow-2xl">
                 <CardHeader className="flex gap-3 items-center">
                     <Image
-                        alt="NextUI logo"
+                        alt="logo"
                         height={40}
                         radius="sm"
-                        src="./icon.png"
+                        src="./yplexity-transparent.png"
                         width={40}
                     />
                     <div className="flex flex-col">
-                        <p className="text-lg font-bold">Yo!Pal</p>
-                        <p className="text-sm text-gray-500">yo-pal.in</p>
+                        <p className="text-lg font-bold">YplexitY</p>
+                        <p className="text-sm text-gray-500">yplexity.com</p>
                     </div>
                 </CardHeader>
                 <Divider />

@@ -97,12 +97,12 @@ export const Navbar = () => {
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/" onClick={() => setIsMenuOpen(false)}>
             <Image
-
+              radius={"full"}
               alt={"logo"}
-              src={"icon.png"}
+              src={"yplexity-transparent.png"}
               width={30}
             />
-            <p className="font-bold text-inherit">Yo!Pal</p>
+            <p className="font-bold text-inherit">YplexitY</p>
           </NextLink>
         </NavbarBrand>
         <ul className="hidden lg:flex gap-4 justify-start ml-2">
@@ -196,7 +196,7 @@ export const Navbar = () => {
         <ThemeSwitch />
         {
           status === "authenticated" && (
-            <Button isIconOnly aria-label="Share" color="danger" onPress={onOpen}>
+            <Button isIconOnly color="danger" onPress={onOpen}>
               <PlusIcon />
             </Button>
           )
@@ -210,7 +210,7 @@ export const Navbar = () => {
               color="danger"
               className="text-sm font-normal text-default-600 bg-default-100"
               onPress={() => setIsMenuOpen(!isMenuOpen)}
-              startContent={<Image radius="full" className="object-cover w-8 h-8 opacity-100" src={avatar} />}
+              startContent={<Image radius="full" className="object-cover opacity-100" src={avatar} />}
               variant="flat"
             >
 

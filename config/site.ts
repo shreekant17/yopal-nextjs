@@ -1,7 +1,7 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "Yo!Pal",
+  name: "YplexitY",
   description: "Make beautiful connections regardless of your experience.",
   navItems: [
     {
