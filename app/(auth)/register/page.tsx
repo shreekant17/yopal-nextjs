@@ -260,6 +260,7 @@ export default function App() {
                             )}
 
                             <Button
+                                isLoading={isLoading}
                                 className="w-full bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg hover:shadow-xl"
                                 type="submit"
                             >

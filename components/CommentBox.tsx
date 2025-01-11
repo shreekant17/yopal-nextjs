@@ -42,6 +42,7 @@ const CommentBox = ({ isOpen, onClose, postId }: CommentProps) => {
     const size = "5xl";
 
     // Typing the state variables
+    const [comment, setComment] = useState("");
     const [comments, setComments] = useState<CommentType[]>([]); // State for comments
     const [token, setToken] = useState<string>("");
     const { data: session } = useSession();
@@ -88,6 +89,7 @@ const CommentBox = ({ isOpen, onClose, postId }: CommentProps) => {
             if (res.ok) {
                 toast.success("Comment added successfully!");
                 // Refresh comments
+                setComment("");
                 getComments();
             } else {
                 const error = await res.json();
@@ -146,6 +148,8 @@ const CommentBox = ({ isOpen, onClose, postId }: CommentProps) => {
                                     rows={1} // Ensures it starts with 1 row
                                     minRows={1} // Prevents it from shrinking below 1 row
                                     isRequired
+                                    value={comment}
+                                    onChange={(e) => setComment(e.target.value)}
                                     className="w-full"
                                     placeholder="Write a comment..."
                                     name="commentText"
