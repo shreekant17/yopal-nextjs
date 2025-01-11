@@ -193,7 +193,7 @@ const Feed: React.FC = () => {
                             >
                                 <HeartIcon
                                     filled={post.likedByUser}
-                                    fill={true ? "red" : "currentColor"}
+                                    fill={post.likedByUser ? "red" : "currentColor"}
                                 />
                             </Button>
                             <Button
