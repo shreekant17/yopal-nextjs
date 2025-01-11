@@ -44,7 +44,7 @@ export default function Home() {
           <Image
 
             alt={"logo"}
-            src={"icon.png"}
+            src={"yplexity-transparent.png"}
             width={30}
           />
 
