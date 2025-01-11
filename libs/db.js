@@ -9,7 +9,7 @@ const connectMongoDB = async () => {
     } catch (err) {
         console.log(err);
     }
- 
+
 }
 
 export default connectMongoDB

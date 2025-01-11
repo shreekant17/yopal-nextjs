@@ -7,7 +7,7 @@ export const GET = async (req) => {
         cookieStore.delete('token');
         return NextResponse.json({ message: "Logout SuccessFull" }, { status: 200 });
     } catch (err) {
-        console.log(err);
+        // console.log(err);
         return NextResponse.json({ message: "Something went wrong", err }, { status: 500 });
     }
 }

@@ -73,7 +73,7 @@ export default function App() {
                             }));
 
 
-                            console.log("Fetched user data:", userInfo);
+
                         }
                     } catch (error) {
                         console.error("Failed to fetch user info:", error);

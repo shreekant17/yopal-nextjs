@@ -2,9 +2,12 @@ import connectMongoDB from "@/libs/db";
 import User from "@/models/userSchema";
 import { NextResponse } from "next/server";
 import Post from "@/models/postSchema";
+import mongoose from "mongoose";
 
-export async function GET() {
+export async function POST(req) {
     await connectMongoDB();
+
+    const { userId } = await req.json();
 
 
 
@@ -21,6 +24,14 @@ export async function GET() {
             $unwind: "$user", // Flatten the array to an object (if a match is found)
         },
         {
+            $lookup: {
+                from: "users", // The name of the User collection
+                localField: "likes", // Array of user IDs who liked the post
+                foreignField: "_id", // Match these user IDs with the `_id` in the User collection
+                as: "likers", // Store the resulting liker details
+            },
+        },
+        {
             $project: {
                 _id: 1,
                 email: 1,
@@ -33,12 +44,23 @@ export async function GET() {
                 comments: 1,
                 createdAt: 1,
                 "user._id": 1,
-                "user.fname": 1, // Include only the name field from the User collection
-                "user.lname": 1, // Include only the name field from the User collection
-                "user.avatar": 1, // Include only the avatar field from the User collection
+                "user.fname": 1,
+                "user.lname": 1,
+                "user.avatar": 1,
+                likers: {
+                    _id: 1,
+                    fname: 1,
+                    lname: 1,
+                    avatar: 1, // Only include required fields for likers
+                },
             },
         },
-    ]).sort({ dateCreated: -1 });
+    ]).sort({ createdAt: -1 });
 
-    return NextResponse.json({ message: "Fetched All Posts", posts: posts }, { status: 200 });
+    const updatedPosts = posts.map((post) => ({
+        ...post,
+        likedByUser: post.likes.map(String).includes(String(userId)), // Convert both to strings for comparison
+    }));
+
+    return NextResponse.json({ message: "Fetched All Posts", posts: updatedPosts }, { status: 200 });
 }

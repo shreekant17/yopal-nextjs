@@ -16,6 +16,8 @@ import {
     DropdownTrigger,
     DropdownItem,
     DropdownMenu,
+    Avatar,
+    AvatarGroup,
 } from "@nextui-org/react";
 import { HeartIcon } from "@/components/HeartIcon";
 import { ShareIcon } from "@/components/ShareIcon";
@@ -42,6 +44,13 @@ type Post = {
     _id: string;
     createdAt: string;
     likes: string[];
+    likedByUser: boolean; // New property
+    likers: [
+        {
+            _id: string, fname: string, lname: string, avatar: string
+        }
+
+    ]
 };
 
 
@@ -49,41 +58,22 @@ type Post = {
 const Feed: React.FC = () => {
     const [posts, setPosts] = useState<Post[]>([]); // State for posts
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [likes, setLikes] = useState<Record<string, boolean>>({}); // State for likes
-    const [likesCount, setLikesCount] = useState<Record<string, number>>({}); // State for likes count
     const { data: session, status } = useSession();
     const [commentPostId, setCommentPostId] = useState<string>("");
     const [userId, setUserId] = useState<string>("");
     const [token, setToken] = useState<string>("");
 
+
+
     // Function to fetch posts
     const getAllPosts = async (userId: string): Promise<void> => {
         try {
-            const response = await fetch("/api/fetchPosts", { method: "GET" });
+            const response = await fetch("/api/fetchPosts", { method: "POST", body: JSON.stringify({ userId }) });
             if (response.ok) {
                 const data = await response.json();
-
                 setPosts(data.posts || []);
+                //console.log(posts)
 
-                // Initialize likes state and likesCount state based on fetched posts
-                const initialLikes = (data.posts || []).reduce(
-                    (acc: Record<string, boolean>, post: Post) => {
-                        acc[post._id] = post.likes.includes(userId);
-                        return acc;
-                    },
-                    {}
-                );
-                setLikes(initialLikes);
-
-                // Initialize likes count state based on fetched posts
-                const initialLikesCount = (data.posts || []).reduce(
-                    (acc: Record<string, number>, post: Post) => {
-                        acc[post._id] = post.likes.length;
-                        return acc;
-                    },
-                    {}
-                );
-                setLikesCount(initialLikesCount);
             }
         } catch (error) {
             console.error("Error fetching posts:", error);
@@ -91,6 +81,9 @@ const Feed: React.FC = () => {
     };
 
     // Function to handle liking a post
+
+
+
     const handleLike = async (postId: string): Promise<void> => {
 
         try {
@@ -103,24 +96,30 @@ const Feed: React.FC = () => {
             });
             if (response.ok) {
                 // Toggle like state locally
-                setLikes((prevLikes) => {
-                    const newLikes = { ...prevLikes, [postId]: !prevLikes[postId] };
-                    const newLikesCount = { ...likesCount };
-                    // Update likes count based on the toggle
-                    if (newLikes[postId]) {
-                        newLikesCount[postId] += 1; // Increment likes count
-                    } else {
-                        newLikesCount[postId] -= 1; // Decrement likes count
-                    }
-                    setLikesCount(newLikesCount); // Update likes count state
-                    return newLikes;
-                });
+                const { likers } = await response.json();
+                setPosts((prevPosts) =>
+                    prevPosts.map((post) =>
+                        post._id === postId
+                            ? {
+                                ...post,
+                                likedByUser: !post.likedByUser, // Toggle the like state
+                                likes: post.likedByUser
+                                    ? post.likes.filter((id) => id !== userId) // Remove user ID
+                                    : [...post.likes, userId], // Add user ID
+                                likers: likers, // Update likers array with API response
+                            }
+                            : post
+                    )
+                );
+                console.log("LikeButtonPressed");
+
             }
         } catch (error) {
             console.error("Error liking the post:", error);
         }
 
     };
+
 
     // Fetch posts when the component mounts
     useEffect(() => {
@@ -187,11 +186,14 @@ const Feed: React.FC = () => {
                                 variant="ghost"
                                 isIconOnly
                                 aria-label="Like"
-                                onPress={() => handleLike(post._id)}
+                                onPress={() => {
+                                    handleLike(post._id);
+
+                                }}
                             >
                                 <HeartIcon
-                                    filled={likes[post._id] || false}
-                                    fill={likes[post._id] ? "red" : "currentColor"}
+                                    filled={post.likedByUser}
+                                    fill={true ? "red" : "currentColor"}
                                 />
                             </Button>
                             <Button
@@ -214,11 +216,43 @@ const Feed: React.FC = () => {
                                 <ShareIcon />
                             </Button>
                         </CardFooter>
-                        {likesCount[post._id] > 0 && (
-                            <p className="px-4 text-xs">
-                                {likesCount[post._id]} like{likesCount[post._id] > 1 ? "s" : ""}
-                            </p>
-                        )}
+
+                        {
+                            post.likes.length > 0 ? (
+                                <AvatarGroup
+                                    className="mx-4"
+                                    isBordered
+                                    max={3}
+                                    renderCount={(count) => (
+                                        <p className="text-small text-foreground font-medium ms-2">
+                                            {post.likes.length === 1
+                                                ? `liked by ${post.likers[0].fname}`
+                                                : post.likes.length === 2
+                                                    ? `liked by ${post.likers[0].fname} and ${count - 1} other`
+                                                    : `liked by ${post.likers[0].fname} and ${count - 1} others`}
+                                        </p>
+                                    )}
+                                    total={post.likes.length}
+                                >
+                                    {post.likers.map((liker, index) => (
+                                        <Avatar
+                                            key={index}
+                                            size="sm"
+                                            style={{ width: '20px', height: '20px' }}
+                                            src={liker.avatar || ""}
+                                            alt={liker.fname}
+                                        />
+                                    ))}
+                                </AvatarGroup>
+                            ) : (
+                                <></>
+                            )
+                        }
+
+
+
+
+
                         <p className="text-xs p-4">{post.content}</p>
                     </Card>
                 ))

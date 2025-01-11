@@ -38,11 +38,11 @@ export const POST = async (req) => {
                         invalidate: true
                     })
                         .then((result) => {
-                            console.log(result);
+                            //console.log(result);
                             resolve(result);
                         })
                         .catch((error) => {
-                            console.log(error);
+                            // console.log(error);
                             reject(error);
                         });
                 });

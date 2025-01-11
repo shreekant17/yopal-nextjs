@@ -60,7 +60,7 @@ export const Navbar = () => {
       const { fname, avatar } = session?.user as SessionUser;
       setFname(fname || "")
       setAvatar(avatar || undefined);
-      console.log(avatar)
+      // console.log(avatar)
     }
 
   }, [session]);

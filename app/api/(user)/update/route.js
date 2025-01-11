@@ -34,7 +34,7 @@ export const POST = async (req) => {
         // Upload image to Cloudinary if file is provided
         let imageUrl = null;
         const image = data.get("file");
-        console.log(image)
+        // console.log(image)
         if (image && image instanceof File && image.size > 0) {
             // Convert file to Base64
             const fileBuffer = await image.arrayBuffer();
