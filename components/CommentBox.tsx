@@ -124,10 +124,10 @@ const CommentBox = ({ isOpen, onClose, postId }: CommentProps) => {
                                             <div className="top flex justify-between items-center">
                                                 <User
                                                     avatarProps={{ src: comment.userDetails?.avatar || "" }}
-                                                    description="Commenter"
+                                                    description={comment.comments.createdAt}
                                                     name={comment.userDetails?.fname || "Anonymous"}
                                                 />
-                                                <p className="text-xs text-gray-500">{comment.comments.createdAt}</p>
+
                                             </div>
                                             <p className="mt-2">{comment.comments.text || "No content"}</p>
                                         </div>
