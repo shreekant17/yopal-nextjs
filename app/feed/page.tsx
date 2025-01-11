@@ -11,13 +11,14 @@ import {
     Image,
     User,
     Skeleton,
+    useDisclosure,
 } from "@nextui-org/react";
 import { HeartIcon } from "@/components/HeartIcon";
 import { ShareIcon } from "@/components/ShareIcon";
 import { CommentsIcon } from "@/components/CommentsIcon";
 import { useSession } from "next-auth/react";
-
-
+import CommentBox from "@/components/CommentBox";
+import { SessionUser } from "@/types";
 
 
 // Define the types for User and Post
@@ -35,18 +36,17 @@ type Post = {
     likes: string[];
 };
 
-export interface SessionUser {
-    id: string;
-    fname?: string; // Other properties, if applicable
-}
+
 
 const Feed: React.FC = () => {
     const [posts, setPosts] = useState<Post[]>([]); // State for posts
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const [likes, setLikes] = useState<Record<string, boolean>>({}); // State for likes
     const [likesCount, setLikesCount] = useState<Record<string, number>>({}); // State for likes count
     const { data: session, status } = useSession();
-
+    const [commentPostId, setCommentPostId] = useState<string>("");
     const [userId, setUserId] = useState<string>("");
+    const [token, setToken] = useState<string>("");
 
     // Function to fetch posts
     const getAllPosts = async (userId: string): Promise<void> => {
@@ -91,7 +91,7 @@ const Feed: React.FC = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ postId }),
+                body: JSON.stringify({ postId, token }),
             });
             if (response.ok) {
                 // Toggle like state locally
@@ -117,12 +117,14 @@ const Feed: React.FC = () => {
     // Fetch posts when the component mounts
     useEffect(() => {
         const storedUserId = (session?.user as SessionUser)?.id || "";
+        setToken((session?.user as SessionUser)?.jwtToken || "")
         setUserId(storedUserId);
         getAllPosts(storedUserId);
     }, [session]);
 
     return (
         <div className="flex flex-col justify-center items-center gap-5 p-0">
+            <CommentBox isOpen={isOpen} onClose={onClose} postId={commentPostId} />
             {posts.length > 0 ? (
                 posts.map((post) => (
                     <Card radius="none" key={post._id} className="w-auto">
@@ -174,6 +176,10 @@ const Feed: React.FC = () => {
                                 }}
                                 radius="full"
                                 variant="ghost"
+                                onPress={() => {
+                                    setCommentPostId(post._id); // First action
+                                    onOpen(); // Second action
+                                }}
                                 isIconOnly aria-label="Comments">
                                 <CommentsIcon filled={false} />
                             </Button>

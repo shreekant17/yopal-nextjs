@@ -1,14 +1,13 @@
 import Post from "@/models/postSchema";
 import { NextResponse } from "next/server";
 import { verifyToken } from "@/libs/jwt";
-import { cookies } from "next/headers";
+
 
 export const POST = async (req) => {
     try {
-        const { postId } = await req.json();
+        const { postId, token } = await req.json();
 
-        const cookieStore = await cookies();
-        const token = cookieStore.get("token").value;
+
 
         if (!postId || !token) {
             return NextResponse.json({ message: "Invalid input" }, { status: 400 });

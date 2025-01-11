@@ -12,7 +12,7 @@ type CommentsIconProps = {
 export const CommentsIcon = ({
     fill = "currentColor",
     filled = true,
-    size = 24,
+    size = 28,
     height,
     width,
     ...props
@@ -27,7 +27,7 @@ export const CommentsIcon = ({
             {...props}
         >
             <path
-                d="M12 2C6.48 2 2 5.9 2 10.5c0 2.87 1.8 5.38 4.49 6.86-.07.58-.39 2.01-1.21 3.14-.2.27-.3.61-.3.96 0 .75.76 1.27 1.47.94 2.19-1.04 3.6-2.08 4.48-2.67.89.18 1.81.27 2.77.27 5.52 0 10-3.9 10-8.5S17.52 2 12 2z"
+                d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 0 1-.923 1.785A5.969 5.969 0 0 0 6 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337Z"
                 stroke={fill}
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -36,3 +36,5 @@ export const CommentsIcon = ({
         </svg>
     );
 };
+
+
