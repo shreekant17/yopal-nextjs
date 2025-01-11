@@ -223,31 +223,83 @@ const Feed: React.FC = () => {
                     </Card>
                 ))
             ) : (
-                <Card radius="none" className="w-screen lg:w-[500px] space-y-5 p-4" >
-                    <div className="w-80  flex items-center gap-3">
-                        <div>
-                            <Skeleton className="flex rounded-full w-12 h-12" />
+                <>
+                    <Card radius="none" className="w-screen lg:w-[500px] space-y-5 p-4" >
+                        <div className="w-80  flex items-center gap-3">
+                            <div>
+                                <Skeleton className="flex rounded-full w-12 h-12" />
+                            </div>
+                            <div className="w-full flex flex-col gap-2">
+                                <Skeleton className="h-3 w-3/5 rounded-lg" />
+                                <Skeleton className="h-3 w-4/5 rounded-lg" />
+                            </div>
                         </div>
-                        <div className="w-full flex flex-col gap-2">
-                            <Skeleton className="h-3 w-3/5 rounded-lg" />
-                            <Skeleton className="h-3 w-4/5 rounded-lg" />
+                        <Skeleton className="rounded-lg">
+                            <div className="h-48 rounded-lg bg-default-300" />
+                        </Skeleton>
+                        <div className="space-y-3 ">
+                            <Skeleton className="w-3/5 rounded-lg">
+                                <div className="h-3 w-3/5 rounded-lg bg-default-200" />
+                            </Skeleton>
+                            <Skeleton className="w-4/5 rounded-lg">
+                                <div className="h-3 w-4/5 rounded-lg bg-default-200" />
+                            </Skeleton>
+                            <Skeleton className="w-2/5 rounded-lg">
+                                <div className="h-3 w-2/5 rounded-lg bg-default-300" />
+                            </Skeleton>
                         </div>
-                    </div>
-                    <Skeleton className="rounded-lg">
-                        <div className="h-48 rounded-lg bg-default-300" />
-                    </Skeleton>
-                    <div className="space-y-3 ">
-                        <Skeleton className="w-3/5 rounded-lg">
-                            <div className="h-3 w-3/5 rounded-lg bg-default-200" />
+                    </Card>
+                    <Card radius="none" className="w-screen lg:w-[500px] space-y-5 p-4" >
+                        <div className="w-80  flex items-center gap-3">
+                            <div>
+                                <Skeleton className="flex rounded-full w-12 h-12" />
+                            </div>
+                            <div className="w-full flex flex-col gap-2">
+                                <Skeleton className="h-3 w-3/5 rounded-lg" />
+                                <Skeleton className="h-3 w-4/5 rounded-lg" />
+                            </div>
+                        </div>
+                        <Skeleton className="rounded-lg">
+                            <div className="h-48 rounded-lg bg-default-300" />
                         </Skeleton>
-                        <Skeleton className="w-4/5 rounded-lg">
-                            <div className="h-3 w-4/5 rounded-lg bg-default-200" />
+                        <div className="space-y-3 ">
+                            <Skeleton className="w-3/5 rounded-lg">
+                                <div className="h-3 w-3/5 rounded-lg bg-default-200" />
+                            </Skeleton>
+                            <Skeleton className="w-4/5 rounded-lg">
+                                <div className="h-3 w-4/5 rounded-lg bg-default-200" />
+                            </Skeleton>
+                            <Skeleton className="w-2/5 rounded-lg">
+                                <div className="h-3 w-2/5 rounded-lg bg-default-300" />
+                            </Skeleton>
+                        </div>
+                    </Card>
+                    <Card radius="none" className="w-screen lg:w-[500px] space-y-5 p-4" >
+                        <div className="w-80  flex items-center gap-3">
+                            <div>
+                                <Skeleton className="flex rounded-full w-12 h-12" />
+                            </div>
+                            <div className="w-full flex flex-col gap-2">
+                                <Skeleton className="h-3 w-3/5 rounded-lg" />
+                                <Skeleton className="h-3 w-4/5 rounded-lg" />
+                            </div>
+                        </div>
+                        <Skeleton className="rounded-lg">
+                            <div className="h-48 rounded-lg bg-default-300" />
                         </Skeleton>
-                        <Skeleton className="w-2/5 rounded-lg">
-                            <div className="h-3 w-2/5 rounded-lg bg-default-300" />
-                        </Skeleton>
-                    </div>
-                </Card>
+                        <div className="space-y-3 ">
+                            <Skeleton className="w-3/5 rounded-lg">
+                                <div className="h-3 w-3/5 rounded-lg bg-default-200" />
+                            </Skeleton>
+                            <Skeleton className="w-4/5 rounded-lg">
+                                <div className="h-3 w-4/5 rounded-lg bg-default-200" />
+                            </Skeleton>
+                            <Skeleton className="w-2/5 rounded-lg">
+                                <div className="h-3 w-2/5 rounded-lg bg-default-300" />
+                            </Skeleton>
+                        </div>
+                    </Card>
+                </>
             )}
         </div>
     );
