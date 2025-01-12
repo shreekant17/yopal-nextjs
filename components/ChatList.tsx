@@ -11,9 +11,10 @@ type ChatListProps = {
 };
 
 
-
 const ChatList = ({ userId, setSelectedChat }: ChatListProps) => {
     const [chatList, setChatList] = useState<ChatType[]>([]);
+    const [searchResults, setSearchResults] = useState<ChatType[]>([]);
+    const [searchQuery, setSearchQuery] = useState("");
 
     const fetchChatList = async () => {
         try {
@@ -38,70 +39,129 @@ const ChatList = ({ userId, setSelectedChat }: ChatListProps) => {
         }
     };
 
+    const searchUsers = async (query: string) => {
+        try {
+            const response = await fetch("/api/search", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ query }),
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                setSearchResults(result.users);
+            } else {
+                const error = await response.json();
+                console.error(error);
+            }
+        } catch (error) {
+            console.error("Error searching users:", error);
+            toast.error("Something went wrong.");
+        }
+    };
+
     useEffect(() => {
         if (userId) {
             fetchChatList();
         }
     }, [userId]);
 
+    useEffect(() => {
+        if (searchQuery) {
+            const delayDebounceFn = setTimeout(() => {
+                searchUsers(searchQuery);
+            }, 300);
+
+            return () => clearTimeout(delayDebounceFn);
+        } else {
+            setSearchResults([]);
+        }
+    }, [searchQuery]);
+
     const handleChatClick = (chat: ChatType) => {
-        setSelectedChat(chat);  // Pass selected chat to parent (ChatWindow)
+        setSelectedChat(chat);
+
     };
 
     return (
         <Card className="w-full h-full p-0">
             <CardHeader>
-
                 <Input
                     aria-label="Search"
                     classNames={{
                         inputWrapper: "bg-default-100",
                         input: "text-sm",
                     }}
-
                     labelPlacement="outside"
                     placeholder="Search..."
                     startContent={
                         <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
                     }
                     type="search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                 />
+
             </CardHeader>
             <Divider />
 
             <CardBody className="gap-4 p-0">
+                {searchResults.length > 0 && (
+                    <div className="absolute z-50 bg-white shadow-lg w-full rounded-md">
+                        {searchResults.map((user, index) => (
+                            <div
+                                key={user.userId}
+                                className="p-2 hover:bg-gray-100 cursor-pointer"
+                                onClick={() => handleChatClick(user)}
+                            >
+                                <User
+                                    avatarProps={{ src: user.avatar }}
+                                    name={user.fname}
+                                    description={user.latestMessage?.text || "No recent messages"}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                )}
                 {chatList.length > 0 ? (
                     <>
                         {chatList.map((chat, index) => (
                             <div key={chat.userId}>
                                 <Button
-                                    className="user w-full bg-none h-max cursor-pointer p-4 flex justify-between align-top"
+                                    className="user w-full border-none h-max cursor-pointer p-4 flex justify-between align-top"
                                     radius="none"
-                                    onPress={() => handleChatClick(chat)} // Set chat as selected
-                                    color="default" // Ensures no color is applied by default
-                                    style={{ backgroundColor: 'transparent', boxShadow: 'none' }} // Ensure no background color or shadow
+                                    onPress={() => handleChatClick(chat)}
+                                    color="default"
+                                    variant="ghost"
                                 >
                                     <User
                                         avatarProps={{ src: chat.avatar }}
-                                        description={chat.latestMessage.text.length > 50 ? chat.latestMessage.text.substring(0, 50) + '...' : chat.latestMessage.text} // Truncate the description to 100 chars
+                                        description={
+                                            chat.latestMessage.text.length > 50
+                                                ? chat.latestMessage.text.substring(0, 50) + "..."
+                                                : chat.latestMessage.text
+                                        }
                                         name={chat.fname}
-
                                     />
                                     <div className="absolute bottom-1 right-1 text-xs text-gray-500">
-                                        {new Date(chat.latestMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        {new Date(chat.latestMessage.createdAt).toLocaleTimeString([], {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                        })}
                                     </div>
                                 </Button>
-
-                                {/* Add Divider after each chat */}
                                 {index !== chatList.length - 1 && <Divider className="m-0" />}
                             </div>
                         ))}
                     </>
-                ) : <p>No chats</p>}
+                ) : (
+                    <p>No chats</p>
+                )}
             </CardBody>
         </Card>
-
     );
-}
+};
 
 export default ChatList;

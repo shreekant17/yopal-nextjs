@@ -32,13 +32,13 @@ const Chat: React.FC = () => {
 
     return (
         <div className='flex w-full h-full'>
-            <div className="list w-full lg:w-1/4 h-full">
+            <div className={`list w-full lg:block lg:w-1/4 h-full ${selectedChat ? 'hidden' : ''}`}>
                 <ChatList userId={userId} setSelectedChat={setSelectedChat} />
             </div>
             <Divider orientation="vertical" className='mx-1 hidden lg:block' />
-            <div className="window w-full lg:w-9/12 h-full hidden lg:block">
+            <div className={`window w-full lg:w-9/12 h-full ${selectedChat ? '' : 'hidden'} lg:block`}>
 
-                <ChatWindow userId={userId} selectedChat={selectedChat} />
+                <ChatWindow userId={userId} selectedChat={selectedChat} setSelectedChat={setSelectedChat} />
             </div>
         </div>
     )

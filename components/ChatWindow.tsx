@@ -1,11 +1,15 @@
-import { Button, Card, CardBody, CardFooter, CardHeader, Divider, Form, Textarea, User } from '@nextui-org/react';
+import { Button, Card, CardBody, CardFooter, CardHeader, Divider, Form, ScrollShadow, Textarea, User } from '@nextui-org/react';
 import { SendIcon } from '@/components/SendIcon';
 import React, { FormEvent, useEffect, useState } from 'react';
 import { ChatType } from '@/types';
+import { LeftArrowIcon } from './LeftArrowIcon';
+import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, getDocs } from "firebase/firestore";
+import { db } from "@/libs/firestore";
 
 
 type ChatWindowProps = {
     selectedChat: ChatType | null; // Accept selectedChat as prop
+    setSelectedChat: (chat: ChatType | null) => void; // New prop to pass selected chat to parent
     userId: string | null; // Accept selectedChat as prop
 };
 
@@ -31,7 +35,16 @@ type Chat = {
     __v: number
 }
 
-const ChatWindow = ({ selectedChat, userId }: ChatWindowProps) => {
+type Snap = {
+    id: string;
+    // Add other fields from doc.data() as needed, for example:
+    // content: string;
+}
+
+
+
+
+const ChatWindow = ({ selectedChat, userId, setSelectedChat }: ChatWindowProps) => {
 
     const [message, setMessage] = useState<string>("");
     const [uid, setUid] = useState<string>("");
@@ -62,8 +75,6 @@ const ChatWindow = ({ selectedChat, userId }: ChatWindowProps) => {
         if (uid && selectedChat) {
             setUid(uid);
             setRid(selectedChat.userId);
-
-
         }
     }, [userId, selectedChat]);
 
@@ -72,6 +83,9 @@ const ChatWindow = ({ selectedChat, userId }: ChatWindowProps) => {
             fetchChats(uid, rid);
 
     }, [uid, rid])
+
+
+
 
     if (!selectedChat) {
 
@@ -109,7 +123,19 @@ const ChatWindow = ({ selectedChat, userId }: ChatWindowProps) => {
 
     return (
         <Card className="w-full h-full">
-            <CardHeader>
+            <CardHeader className='flex align-center'>
+                <Button
+                    isIconOnly
+                    onPress={() => {
+                        setSelectedChat(null);
+                    }}
+                    className='border-none'
+                    radius='full'
+                    variant="ghost"
+                >
+
+                    <LeftArrowIcon />
+                </Button>
                 <User
                     avatarProps={{ src: selectedChat.avatar }}
                     description="online"
@@ -117,58 +143,63 @@ const ChatWindow = ({ selectedChat, userId }: ChatWindowProps) => {
                 />
             </CardHeader>
             <Divider />
-            <CardBody className="h-full flex-col gap-3 p-8">
-                {
-                    chats.length > 0 ? (
-                        chats.map((chat) => (
-                            chat.sender._id === uid ? (
-                                <div className="send flex justify-end received" key={chat._id}>
-                                    <Textarea
-                                        value={chat.text || ""}
-                                        isRequired
-                                        className="max-w-md"
-                                        isReadOnly
-                                        rows={1}
-                                        minRows={1}
-                                        endContent={
-                                            (
-                                                <div className="absolute bottom-1 right-1 text-xs text-gray-500">
-                                                    {new Date(chat.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                </div>
-                                            )
-                                        }
-                                    />
+            <ScrollShadow hideScrollBar className="h-[70vh]">
+                <CardBody className="h-full flex-col gap-3 p-8">
+                    {
+                        chats.length > 0 ? (
+                            chats.map((chat) => (
+                                chat.sender._id === uid ? (
+                                    <div className="send flex  justify-end received" key={chat._id}>
+
+                                        <Textarea
+                                            value={chat.text || ""}
+                                            isRequired
+                                            className="lg:max-w-sm"
+                                            isReadOnly
+                                            rows={1}
+                                            minRows={1}
+
+                                            endContent={
+                                                (
+                                                    <div className="absolute bottom-1 right-1 text-xs text-gray-500">
+                                                        {new Date(chat.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </div>
+                                                )
+                                            }
+                                        />
 
 
-                                </div>
-                            ) : (
-                                <div className="received" key={chat._id}>
-                                    <Textarea
-                                        value={chat.text || ""}
-                                        isRequired
-                                        className="max-w-sm"
-                                        isReadOnly
-                                        rows={1}
-                                        minRows={1}
-                                        endContent={
-                                            (
-                                                <div className="absolute bottom-1 right-1 text-xs text-gray-500">
-                                                    {new Date(chat.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                </div>
-                                            )
-                                        }
-                                    />
-                                </div>
-                            )
-                        ))
-                    ) : (
-                        <></>
-                    )
-                }
+                                    </div>
+                                ) : (
+                                    <div className="received" key={chat._id}>
+                                        <Textarea
+
+                                            value={chat.text || ""}
+                                            isRequired
+                                            className="max-w-sm"
+                                            isReadOnly
+                                            rows={1}
+                                            minRows={1}
+                                            endContent={
+                                                (
+                                                    <div className="absolute bottom-1 right-1 text-xs text-gray-500">
+                                                        {new Date(chat.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </div>
+                                                )
+                                            }
+                                        />
+                                    </div>
+                                )
+                            ))
+                        ) : (
+                            <></>
+                        )
+                    }
 
 
 
-            </CardBody>
+                </CardBody>
+            </ScrollShadow>
             <CardFooter>
                 <Form className="p-4 h-min w-full space-y-4" onSubmit={sendMessage}>
                     <div className="flex items-end w-full">
