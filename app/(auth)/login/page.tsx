@@ -1,14 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  Form,
-  Input,
-  Select,
-  SelectItem,
-  Checkbox,
-  Button,
-} from "@nextui-org/react";
+import { Form, Input, Checkbox, Button } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import {
   Card,

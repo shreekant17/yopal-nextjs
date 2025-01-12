@@ -13,18 +13,7 @@ import {
 import { SendIcon } from "@/components/SendIcon";
 import React, { FormEvent, useEffect, useState } from "react";
 import { ChatType } from "@/types";
-import { LeftArrowIcon } from "./LeftArrowIcon";
-import {
-  collection,
-  query,
-  where,
-  orderBy,
-  onSnapshot,
-  addDoc,
-  serverTimestamp,
-  getDocs,
-} from "firebase/firestore";
-import { db } from "@/libs/firestore";
+import { LeftArrowIcon } from "@/components/LeftArrowIcon";
 
 type ChatWindowProps = {
   selectedChat: ChatType | null; // Accept selectedChat as prop

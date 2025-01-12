@@ -4,14 +4,13 @@ import {
   CardBody,
   CardHeader,
   Input,
-  Link,
   User,
 } from "@nextui-org/react";
 import { Divider } from "@nextui-org/divider";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { ChatType } from "@/types";
-import { SearchIcon } from "./icons";
+import { SearchIcon } from "@/components/icons";
 
 type ChatListProps = {
   userId: string;
@@ -38,7 +37,7 @@ const ChatList = ({ userId, setSelectedChat }: ChatListProps) => {
         setChatList(result.users);
       } else {
         const error = await response.json();
-        console.error(error);
+        //console.error(error);
       }
     } catch (error) {
       console.error("Error fetching chats:", error);
@@ -61,10 +60,10 @@ const ChatList = ({ userId, setSelectedChat }: ChatListProps) => {
         setSearchResults(result.users);
       } else {
         const error = await response.json();
-        console.error(error);
+        //console.error(error);
       }
     } catch (error) {
-      console.error("Error searching users:", error);
+      // console.error("Error searching users:", error);
       toast.error("Something went wrong.");
     }
   };
@@ -114,12 +113,15 @@ const ChatList = ({ userId, setSelectedChat }: ChatListProps) => {
 
       <CardBody className="gap-4 p-0">
         {searchResults.length > 0 && (
-          <div className="absolute z-50 bg-white shadow-lg w-full rounded-md">
-            {searchResults.map((user, index) => (
+          <div className=" bg-white shadow-lg w-full rounded-md">
+            {searchResults.map((user) => (
               <div
                 key={user.userId}
                 className="p-2 hover:bg-gray-100 cursor-pointer"
                 onClick={() => handleChatClick(user)}
+                onKeyDown={(e) => e.key === "Enter" && handleChatClick(user)}
+                role="button"
+
               >
                 <User
                   avatarProps={{ src: user.avatar }}
