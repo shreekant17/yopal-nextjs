@@ -133,7 +133,7 @@ const CommentBox = ({ isOpen, onClose, postId }: CommentProps) => {
                                                 />
 
                                             </div>
-                                            <Textarea isReadOnly className=" w-full h-content  p-2 rounded-lg  text-sm " placeholder={comment.comments.text || "No content"} />
+                                            <Textarea isReadOnly className=" w-full h-content  p-2 rounded-lg  text-sm " value={comment.comments.text || "No content"} />
 
                                         </div>
                                     ))

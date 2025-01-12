@@ -105,7 +105,7 @@ export default function App() {
 
 
     return (
-        <div className="flex justify-center items-center w-full">
+        <div className="flex justify-center items-center w-full pt-16">
             <Card className="w-full max-w-lg p-6 shadow-2xl">
                 <CardHeader className="flex gap-3 items-center">
                     <Image

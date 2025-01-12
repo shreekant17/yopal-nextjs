@@ -168,8 +168,8 @@ export default function App() {
 
 
     return (
-        <div className="flex justify-center items-center w-full">
-            <Card className="lg:w-1/2">
+        <div className="flex justify-center items-center w-full pt-16">
+            <Card className="lg:w-1/3 w-screen">
                 <Form className="p-2 w-full space-y-6" onSubmit={handleSubmit} encType="multipart/form-data">
                     <CardHeader className="flex gap-3 justify-between w-full">
                         <div className="profile flex items-center gap-x-4">

@@ -20,6 +20,15 @@ export type Post = {
   likes: string[];
 };
 
+export type ChatType = {
+  userId: string,
+  fname: string,
+  lname: string,
+  avatar: string,
+  email: string,
+  latestMessage: { text: string, createdAt: string }
+}
+
 
 export interface SessionUser {
   id: string;

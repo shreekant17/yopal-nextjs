@@ -159,10 +159,8 @@ export const Navbar = () => {
                       <p className="font-semibold">{session?.user?.email}</p>
                     </DropdownItem>
                     <DropdownItem key="settings" as={Link} href={"/account"}>My Account</DropdownItem>
-                    <DropdownItem key="team_settings">Team Settings</DropdownItem>
-                    <DropdownItem key="analytics">Analytics</DropdownItem>
-                    <DropdownItem key="system">System</DropdownItem>
-                    <DropdownItem key="configurations">Configurations</DropdownItem>
+                    <DropdownItem key="chat" as={Link} href={"/chat"}>Chat</DropdownItem>
+
                     <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
                     <DropdownItem key="logout" color="danger"
 
