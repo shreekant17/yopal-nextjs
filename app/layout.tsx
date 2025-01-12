@@ -1,5 +1,3 @@
-
-
 import "@/styles/globals.css";
 import { Metadata, Viewport } from "next";
 import { Link } from "@nextui-org/link";
@@ -37,9 +35,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-
-
-
     <html suppressHydrationWarning lang="en">
       <head />
       <body
@@ -50,21 +45,17 @@ export default function RootLayout({
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <AuthProvider>
-
             <div className="relative flex flex-col h-screen">
               <SessionWrapper>
                 <Navbar />
                 <main className="container max-w-none w-screen  flex-grow">
                   {children}
                 </main>
-
               </SessionWrapper>
-
             </div>
           </AuthProvider>
         </Providers>
       </body>
     </html>
-
   );
 }

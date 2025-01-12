@@ -2,10 +2,16 @@
 
 import { useAuth } from "@/store/auth";
 
-import { Avatar, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
+import {
+  Avatar,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@nextui-org/react";
 import { useState } from "react";
 import { useEffect } from "react";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import {
   Navbar as NextUINavbar,
   NavbarContent,
@@ -22,7 +28,7 @@ import { Input } from "@nextui-org/input";
 import { button, link as linkStyles } from "@nextui-org/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
-import { useDisclosure } from '@nextui-org/react';
+import { useDisclosure } from "@nextui-org/react";
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import {
@@ -39,13 +45,12 @@ import { Image } from "@nextui-org/react";
 import { UserIcon } from "./UserIcon";
 import { ExitIcon } from "./ExitIcon";
 import { LoginIcon } from "./LoginIcon";
-import { useSession } from "next-auth/react"
+import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react";
 import { Router } from "next/router";
 import { SessionUser } from "@/types";
 import { UserSession } from "@/types";
 import React from "react";
-
 
 export const Navbar = () => {
   const { logout } = useAuth();
@@ -56,15 +61,12 @@ export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   useEffect(() => {
     if (session) {
-
       const { fname, avatar } = session?.user as SessionUser;
-      setFname(fname || "")
+      setFname(fname || "");
       setAvatar(avatar || undefined);
       // console.log(avatar)
     }
-
   }, [session]);
-
 
   const router = useRouter();
 
@@ -90,12 +92,21 @@ export const Navbar = () => {
   );
 
   return (
-    <NextUINavbar maxWidth="xl" position="sticky" isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
+    <NextUINavbar
+      maxWidth="xl"
+      position="sticky"
+      isMenuOpen={isMenuOpen}
+      onMenuOpenChange={setIsMenuOpen}
+    >
       <UploadPost isOpen={isOpen} onClose={onClose} />
 
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-1" href="/" onClick={() => setIsMenuOpen(false)}>
+          <NextLink
+            className="flex justify-start items-center gap-1"
+            href="/"
+            onClick={() => setIsMenuOpen(false)}
+          >
             <Image
               radius={"full"}
               alt={"logo"}
@@ -132,107 +143,96 @@ export const Navbar = () => {
             <PlusIcon />
           </Button>
           <ThemeSwitch />
-
         </NavbarItem>
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
         <NavbarItem className="hidden md:flex">
-          {
-            status === "authenticated" ? (
+          {status === "authenticated" ? (
+            <NavbarContent as="div" justify="end" className="hidden lg:flex">
+              <Dropdown placement="bottom-end">
+                <DropdownTrigger>
+                  <Button
+                    className="text-sm font-normal text-default-600 bg-default-100"
+                    startContent={
+                      <Image
+                        radius="full"
+                        className="object-cover w-8 h-8 opacity-100"
+                        src={avatar}
+                      />
+                    }
+                    variant="flat"
+                  >
+                    {fname}
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu aria-label="Profile Actions" variant="flat">
+                  <DropdownItem key="profile" className="h-14 gap-2">
+                    <p className="font-semibold">Signed in as</p>
+                    <p className="font-semibold">{session?.user?.email}</p>
+                  </DropdownItem>
+                  <DropdownItem key="settings" as={Link} href={"/account"}>
+                    My Account
+                  </DropdownItem>
+                  <DropdownItem key="chat" as={Link} href={"/chat"}>
+                    Chat
+                  </DropdownItem>
 
-              <NavbarContent as="div" justify="end" className="hidden lg:flex">
-
-                <Dropdown placement="bottom-end">
-                  <DropdownTrigger>
-                    <Button
-
-                      className="text-sm font-normal text-default-600 bg-default-100"
-
-                      startContent={<Image radius="full" className="object-cover w-8 h-8 opacity-100" src={avatar} />}
-                      variant="flat"
-                    >
-                      {fname}
-                    </Button>
-                  </DropdownTrigger>
-                  <DropdownMenu aria-label="Profile Actions" variant="flat">
-                    <DropdownItem key="profile" className="h-14 gap-2">
-                      <p className="font-semibold">Signed in as</p>
-                      <p className="font-semibold">{session?.user?.email}</p>
-                    </DropdownItem>
-                    <DropdownItem key="settings" as={Link} href={"/account"}>My Account</DropdownItem>
-                    <DropdownItem key="chat" as={Link} href={"/chat"}>Chat</DropdownItem>
-
-                    <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
-                    <DropdownItem key="logout" color="danger"
-
-                      onPress={logout}
-                    >
-                      Log Out
-                    </DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
-              </NavbarContent>
-
-            ) : (
-              <Button
-
-                as={Link}
-                className="text-sm font-normal text-default-600 bg-default-100"
-                href={"/login"}
-                startContent={<UserIcon />}
-                variant="flat"
-              >
-                Sign In
-              </Button>
-            )
-          }
-
+                  <DropdownItem key="help_and_feedback">
+                    Help & Feedback
+                  </DropdownItem>
+                  <DropdownItem key="logout" color="danger" onPress={logout}>
+                    Log Out
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            </NavbarContent>
+          ) : (
+            <Button
+              as={Link}
+              className="text-sm font-normal text-default-600 bg-default-100"
+              href={"/login"}
+              startContent={<UserIcon />}
+              variant="flat"
+            >
+              Sign In
+            </Button>
+          )}
         </NavbarItem>
       </NavbarContent>
 
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
-
         <ThemeSwitch />
-        {
-          status === "authenticated" && (
-            <Button isIconOnly color="danger" onPress={onOpen}>
-              <PlusIcon />
-            </Button>
-          )
-        }
+        {status === "authenticated" && (
+          <Button isIconOnly color="danger" onPress={onOpen}>
+            <PlusIcon />
+          </Button>
+        )}
 
-        {
-          status === "authenticated" ? (
-            <Button
-              isIconOnly
-              radius="full"
-              color="danger"
-              className="text-sm font-normal text-default-600 bg-default-100"
-              onPress={() => setIsMenuOpen(!isMenuOpen)}
-              startContent={<Image radius="full" className="object-cover opacity-100" src={avatar} />}
-              variant="flat"
-            >
-
-            </Button>
-          ) : (
-            <Button
-              isIconOnly
-              onPress={() => {
-                router.push("/login");
-              }}
-
-            >
-              <UserIcon />
-
-            </Button>
-          )
-        }
-
-
-
-
-
-
-
+        {status === "authenticated" ? (
+          <Button
+            isIconOnly
+            radius="full"
+            color="danger"
+            className="text-sm font-normal text-default-600 bg-default-100"
+            onPress={() => setIsMenuOpen(!isMenuOpen)}
+            startContent={
+              <Image
+                radius="full"
+                className="object-cover opacity-100"
+                src={avatar}
+              />
+            }
+            variant="flat"
+          ></Button>
+        ) : (
+          <Button
+            isIconOnly
+            onPress={() => {
+              router.push("/login");
+            }}
+          >
+            <UserIcon />
+          </Button>
+        )}
       </NavbarContent>
 
       <NavbarMenu>
@@ -242,23 +242,17 @@ export const Navbar = () => {
             <Link
               size="lg"
               href="/account"
-              color={
-                "foreground"
-              }
+              color={"foreground"}
               onPress={() => setIsMenuOpen(false)}
-
             >
               Account
             </Link>
           </NavbarMenuItem>
           <NavbarMenuItem>
             <Link
-
               size="lg"
               href="/feed"
-              color={
-                "foreground"
-              }
+              color={"foreground"}
               onPress={() => setIsMenuOpen(false)}
             >
               Feed
@@ -266,13 +260,7 @@ export const Navbar = () => {
           </NavbarMenuItem>
           {siteConfig.navMenuItems.map((item, index) => (
             <NavbarMenuItem key={`${item}-${index}`}>
-              <Link
-                color={
-                  "foreground"
-                }
-                href="#"
-                size="lg"
-              >
+              <Link color={"foreground"} href="#" size="lg">
                 {item.label}
               </Link>
             </NavbarMenuItem>
@@ -289,11 +277,9 @@ export const Navbar = () => {
             >
               Logout
             </Link>
-
           </NavbarMenuItem>
         </div>
       </NavbarMenu>
-
     </NextUINavbar>
   );
 };

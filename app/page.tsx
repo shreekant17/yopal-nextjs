@@ -25,7 +25,6 @@ export default function Home() {
 
       <div className="flex gap-3">
         <Link
-
           className={buttonStyles({
             color: "primary",
             radius: "full",
@@ -36,23 +35,13 @@ export default function Home() {
           Login
         </Link>
         <Link
-
           className={buttonStyles({ variant: "bordered", radius: "full" })}
           href={"/register"}
         >
-
-          <Image
-
-            alt={"logo"}
-            src={"yplexity-transparent.png"}
-            width={30}
-          />
-
+          <Image alt={"logo"} src={"yplexity-transparent.png"} width={30} />
           Sign Up
         </Link>
       </div>
-
-
     </section>
   );
 }

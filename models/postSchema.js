@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const postSchema = new mongoose.Schema({
   email: {
@@ -14,21 +14,19 @@ const postSchema = new mongoose.Schema({
   },
 
   media: {
-
     type: String, // URLs to media files (images, videos)
-
   },
   likes: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User', // Referencing User model for who liked the post
+      ref: "User", // Referencing User model for who liked the post
     },
   ],
   comments: [
     {
       user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // Referencing User model for the commenter
+        ref: "User", // Referencing User model for the commenter
       },
       text: {
         type: String,
@@ -44,7 +42,7 @@ const postSchema = new mongoose.Schema({
   shares: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User', // Referencing User model for who shared the post
+      ref: "User", // Referencing User model for who shared the post
     },
   ],
   createdAt: {
@@ -56,8 +54,8 @@ const postSchema = new mongoose.Schema({
   },
   visibility: {
     type: String,
-    enum: ['public', 'friends', 'private'], // Privacy settings
-    default: 'public',
+    enum: ["public", "friends", "private"], // Privacy settings
+    default: "public",
   },
   isEdited: {
     type: Boolean,
@@ -65,5 +63,5 @@ const postSchema = new mongoose.Schema({
   },
 });
 
-const Post = mongoose.models.Post || mongoose.model('Post', postSchema);
+const Post = mongoose.models.Post || mongoose.model("Post", postSchema);
 module.exports = Post;

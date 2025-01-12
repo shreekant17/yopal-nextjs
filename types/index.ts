@@ -5,7 +5,6 @@ export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
 };
 
-
 export type User = {
   avatar: string;
   email: string;
@@ -21,14 +20,13 @@ export type Post = {
 };
 
 export type ChatType = {
-  userId: string,
-  fname: string,
-  lname: string,
-  avatar: string,
-  email: string,
-  latestMessage: { text: string, createdAt: string }
-}
-
+  userId: string;
+  fname: string;
+  lname: string;
+  avatar: string;
+  email: string;
+  latestMessage: { text: string; createdAt: string };
+};
 
 export interface SessionUser {
   id: string;
@@ -37,7 +35,7 @@ export interface SessionUser {
   email?: string; // Other properties, if applicable
   avatar?: string;
   country?: string;
-  jwtToken?: string// Other properties, if applicable
+  jwtToken?: string; // Other properties, if applicable
 }
 export type UserSession = {
   id: string;
@@ -46,5 +44,5 @@ export type UserSession = {
   email?: string; // Other properties, if applicable
   avatar?: string;
   country?: string;
-  jwtToken?: string// Other properties, if applicable
-}
+  jwtToken?: string; // Other properties, if applicable
+};

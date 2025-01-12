@@ -5,7 +5,6 @@ import { verifyToken } from "@/libs/jwt";
 import Post from "@/models/postSchema";
 import connectMongoDB from "@/libs/db";
 export const POST = async (req) => {
-
   const formData = await req.formData();
 
   const file = formData.get("file");
@@ -19,16 +18,16 @@ export const POST = async (req) => {
   try {
     await writeFile(
       path.join(process.cwd(), "public/posts/" + filename),
-      buffer
+      buffer,
     );
 
-    const token = formData.get('token');
+    const token = formData.get("token");
     if (token) {
       const user = verifyToken(token);
 
       const email = user.email;
-      const content = formData.get('content');
-      const type = formData.get('type');
+      const content = formData.get("content");
+      const type = formData.get("type");
       const media = filename;
 
       const post = {
@@ -36,15 +35,12 @@ export const POST = async (req) => {
         content: content,
         type: type,
         media: media,
-      }
+      };
       await connectMongoDB();
       await Post.create(post);
     }
     return NextResponse.json({ Message: "Success", status: 201 });
   } catch (error) {
-
     return NextResponse.json({ Message: "Failed", status: 500 });
   }
-
-
 };

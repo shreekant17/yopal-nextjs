@@ -30,7 +30,8 @@ export function Providers({ children, themeProps }: ProvidersProps) {
     <NextUIProvider navigate={router.push}>
       <NextThemesProvider {...themeProps}>
         <ToastContainer />
-        {children}</NextThemesProvider>
+        {children}
+      </NextThemesProvider>
     </NextUIProvider>
   );
 }

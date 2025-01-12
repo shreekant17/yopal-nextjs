@@ -1,11 +1,10 @@
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 
 //const secret = 'StateBankOfIndia';
 const secret = process.env.JWT_SECRET_KEY; // Replace with a strong, secret key
 
 export const generateToken = (payload) => {
-
-  return jwt.sign(payload, secret, { expiresIn: '5d' }); // Adjust the expiration time as needed
+  return jwt.sign(payload, secret, { expiresIn: "5d" }); // Adjust the expiration time as needed
 };
 
 export const verifyToken = (token) => {

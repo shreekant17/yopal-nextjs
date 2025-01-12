@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FormEvent, useEffect } from 'react'
+import React, { FormEvent, useEffect } from "react";
 import {
   Modal,
   ModalContent,
@@ -14,17 +14,17 @@ import {
   Textarea,
   Image,
   RadioGroup,
-  Radio
+  Radio,
 } from "@nextui-org/react";
-import { toast } from 'react-toastify';
-import { useSession } from 'next-auth/react';
+import { toast } from "react-toastify";
+import { useSession } from "next-auth/react";
 
 // Typing for the props passed to the UploadPost component
 type UploadPostProps = {
   isOpen: boolean;
   onClose: () => void;
 };
-import { useState } from 'react';
+import { useState } from "react";
 
 interface SessionUser {
   id: string;
@@ -51,7 +51,6 @@ const UploadPost = ({ isOpen, onClose }: UploadPostProps) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string); // Set the image preview URL
-
       };
       reader.readAsDataURL(file); // Read the file as data URL
       setBtnStatus(false);
@@ -61,7 +60,6 @@ const UploadPost = ({ isOpen, onClose }: UploadPostProps) => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-
 
     if (token) {
       formData.append("token", token);
@@ -84,7 +82,6 @@ const UploadPost = ({ isOpen, onClose }: UploadPostProps) => {
     }
   };
 
-
   useEffect(() => {
     if (session) {
       const token = (session?.user as SessionUser).jwtToken || "";
@@ -97,7 +94,9 @@ const UploadPost = ({ isOpen, onClose }: UploadPostProps) => {
       <Modal isOpen={isOpen} size={size} onClose={onClose}>
         <ModalContent>
           <>
-            <ModalHeader className="flex flex-col gap-1">Create New Post</ModalHeader>
+            <ModalHeader className="flex flex-col gap-1">
+              Create New Post
+            </ModalHeader>
             <ModalBody>
               <Form
                 id="upload-form"
@@ -107,7 +106,6 @@ const UploadPost = ({ isOpen, onClose }: UploadPostProps) => {
                 onSubmit={handleSubmit}
               >
                 <div className="flex flex-col gap-4 max-w-md">
-
                   {imagePreview && (
                     <Image
                       alt="NextUI hero Image with delay"
@@ -128,7 +126,12 @@ const UploadPost = ({ isOpen, onClose }: UploadPostProps) => {
                     onChange={handleFileChange} // Add onChange handler
                     className="w-full"
                   />
-                  <RadioGroup name="type" label="Select Media Type" orientation="horizontal" isRequired>
+                  <RadioGroup
+                    name="type"
+                    label="Select Media Type"
+                    orientation="horizontal"
+                    isRequired
+                  >
                     <Radio value="image">Picture</Radio>
                     <Radio value="video">Video</Radio>
                   </RadioGroup>
@@ -141,10 +144,7 @@ const UploadPost = ({ isOpen, onClose }: UploadPostProps) => {
                     variant="bordered"
                     name="content"
                   />
-
                 </div>
-
-
               </Form>
             </ModalBody>
             <ModalFooter>
@@ -166,7 +166,7 @@ const UploadPost = ({ isOpen, onClose }: UploadPostProps) => {
         </ModalContent>
       </Modal>
     </div>
-  )
-}
+  );
+};
 
 export default UploadPost;
