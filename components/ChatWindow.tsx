@@ -17,9 +17,9 @@ import { ChatType } from "@/types";
 import { LeftArrowIcon } from "@/components/LeftArrowIcon";
 import { doc, collection, orderBy, onSnapshot, query, getDocs, limit, } from "firebase/firestore";
 
-//import { db } from "@/libs/firestore";
+import { db } from "@/libs/firestore";
 
-import { db } from "@/app/firebaseConfig"
+//import { db } from "@/app/firebaseConfig"
 
 type ChatWindowProps = {
   selectedChat: ChatType | null; // Accept selectedChat as prop
