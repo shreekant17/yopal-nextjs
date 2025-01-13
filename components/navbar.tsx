@@ -258,6 +258,16 @@ export const Navbar = () => {
               Feed
             </Link>
           </NavbarMenuItem>
+          <NavbarMenuItem>
+            <Link
+              size="lg"
+              href="/chat"
+              color={"foreground"}
+              onPress={() => setIsMenuOpen(false)}
+            >
+              Chat
+            </Link>
+          </NavbarMenuItem>
           {siteConfig.navMenuItems.map((item, index) => (
             <NavbarMenuItem key={`${item}-${index}`}>
               <Link color={"foreground"} href="#" size="lg">

@@ -6,14 +6,20 @@ import {
   CardHeader,
   Divider,
   Form,
+  Input,
   ScrollShadow,
   Textarea,
   User,
 } from "@nextui-org/react";
 import { SendIcon } from "@/components/SendIcon";
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { ChatType } from "@/types";
 import { LeftArrowIcon } from "@/components/LeftArrowIcon";
+import { doc, collection, orderBy, onSnapshot, query, getDocs, limit, } from "firebase/firestore";
+
+//import { db } from "@/libs/firestore";
+
+import { db } from "@/app/firebaseConfig"
 
 type ChatWindowProps = {
   selectedChat: ChatType | null; // Accept selectedChat as prop
@@ -43,6 +49,45 @@ type Chat = {
   __v: number;
 };
 
+async function fetchDataFirestore(
+  userPairId: string, uid: string, rid: string, fetchChats: (uid: string, rid: string, isRealtime: boolean) => Promise<void>, setChats: React.Dispatch<React.SetStateAction<Chat[]>>
+) {
+  // Reference to the "messages" subcollection
+  const messagesRef = collection(db, "messages", userPairId, "message");
+
+  // Query with ordering by timestamp in ascending order
+  const messagesQuery = query(messagesRef, orderBy("timestamp", "asc"));
+
+  // Flag to skip the initial load
+  let isInitialLoad = true;
+
+  // Listen for real-time updates
+  const unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
+    if (isInitialLoad) {
+      // Skip processing on the first load
+      isInitialLoad = false;
+      return;
+    }
+
+    console.log("Snapshot received:", querySnapshot);
+
+    querySnapshot.docChanges().forEach((change) => {
+      if (change.type === "added") {
+        const newMessage = { _id: change.doc.id, ...change.doc.data() };
+
+        // Process only newly added messages
+        console.log("New message added:", newMessage);
+        fetchChats(uid, rid, true);
+
+
+        // Optionally call fetchChats if needed
+        // await fetchChats(uid, rid);
+      }
+    });
+  });
+
+
+}
 const ChatWindow = ({
   selectedChat,
   userId,
@@ -52,37 +97,94 @@ const ChatWindow = ({
   const [uid, setUid] = useState<string>("");
   const [rid, setRid] = useState<string>("");
   const [chats, setChats] = useState<Chat[]>([]);
+  const [userPairId, setUserPairId] = useState("");
 
-  const fetchChats = async (uid: string, rid: string) => {
+
+
+  const chatEndRef = useRef<HTMLDivElement | null>(null); // Ref for the end of the chat
+
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({});
+  };
+
+  const fetchChats = async (uid: string, rid: string, isRealtime: boolean) => {
     try {
       const response = await fetch("api/fetchChats", {
         method: "POST",
         body: JSON.stringify({ userId: uid, receiverId: rid }),
+        headers: { "Content-Type": "application/json" },
       });
+
       if (response.ok) {
         const result = await response.json();
+
         console.log(result);
-        setChats(result.messages);
+
+        // Add only new messages
+        if (result.messages && result.messages.length > 0) {
+          if (isRealtime) {
+            setChats((prevChats: Chat[]) => {
+              // Get IDs of current messages in state
+              const existingIds = new Set(prevChats.map((chat) => chat._id));
+
+              // Filter messages that are not already in the state
+              const newMessages = result.messages.filter(
+                (message: Chat) => !existingIds.has(message._id)
+              );
+
+              // Return the updated chat array with new messages
+              return [...prevChats, ...newMessages];
+            });
+
+          } else {
+
+            setChats(result.messages);
+          }
+
+
+
+        }
       } else {
+        // Handle errors if the response isn't OK
         const result = await response.json();
-        console.log(result);
+        console.error("Error fetching chats:", result);
       }
     } catch (err) {
-      console.log(err);
+      console.error("Error in fetchChats:", err);
     }
   };
+
 
   useEffect(() => {
     const uid = userId || "";
     if (uid && selectedChat) {
       setUid(uid);
       setRid(selectedChat.userId);
+
+
     }
   }, [userId, selectedChat]);
 
+
   useEffect(() => {
-    if (selectedChat) fetchChats(uid, rid);
+    if (selectedChat) {
+      const userPairId = uid < rid ? `${uid}-${rid}` : `${rid}-${uid}`;
+      fetchChats(uid, rid, false);  // Assuming this fetches the initial messages
+
+      fetchDataFirestore(userPairId, uid, rid, fetchChats, setChats);
+
+    }
   }, [uid, rid]);
+
+
+  useEffect(() => {
+    // Scroll to bottom whenever chats change
+    scrollToBottom();
+  }, [chats]);
+
+
+
+
 
   if (!selectedChat) {
     return (
@@ -113,6 +215,8 @@ const ChatWindow = ({
       console.log(err);
     }
   };
+
+
 
   return (
     <Card className="w-full h-full">
@@ -182,20 +286,20 @@ const ChatWindow = ({
           ) : (
             <></>
           )}
+          <div ref={chatEndRef} />
         </CardBody>
       </ScrollShadow>
       <CardFooter>
         <Form className="p-4 h-min w-full space-y-4" onSubmit={sendMessage}>
           <div className="flex items-end w-full">
-            <Textarea
-              rows={1}
-              minRows={1}
+            <Input
+
               isRequired
               className="flex-grow"
               placeholder="Write a message..."
               name="text"
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={(e: any) => setMessage(e.target.value)}
             />
             <Button
               isIconOnly

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import Message from "@/models/messageSchema";
 import { db } from "@/libs/firestore"; // Adjust path as necessary
-import { collection, addDoc } from "firebase/firestore";
+import { doc, updateDoc, arrayUnion, collection, addDoc, setDoc } from "firebase/firestore";
 
 export async function POST(req) {
   try {
@@ -25,12 +25,22 @@ export async function POST(req) {
     await Message.create(message);
 
     // Save message in Firestore
-    const messageRef = collection(db, "messages");
-    await addDoc(messageRef, {
+    const userPairId = sender < receiver ? `${sender}-${receiver}` : `${receiver}-${sender}`; // Create userPairId
+
+    const messagesCollectionRef = collection(db, "messages");
+
+    // Reference to the document for the specific userPairId
+    const userPairDocRef = doc(messagesCollectionRef, userPairId);
+
+    // Reference to the "message" subcollection inside userPairId document
+    const messageCollectionRef = collection(userPairDocRef, "message");
+
+    // Add a new message as a separate document in the "message" subcollection
+    await addDoc(messageCollectionRef, {
       sender,
       receiver,
       text,
-      timestamp: new Date().toISOString(), // Add a timestamp for sorting
+      timestamp: new Date().toISOString(),
     });
 
     return NextResponse.json({ message: "Message Sent" }, { status: 200 });
