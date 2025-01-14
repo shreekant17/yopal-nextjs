@@ -15,9 +15,12 @@ import { SendIcon } from "@/components/SendIcon";
 import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { ChatType } from "@/types";
 import { LeftArrowIcon } from "@/components/LeftArrowIcon";
-import { doc, collection, orderBy, onSnapshot, query, getDocs, limit, } from "firebase/firestore";
+import { doc, collection, orderBy, onSnapshot, query, getDocs, limit, CollectionReference, DocumentReference, getFirestore, } from "firebase/firestore";
+import { initializeApp } from "firebase/app";
+import { useAuth } from "@/store/auth";
 
-import { db } from "@/libs/firestore";
+
+//import { db } from "@/libs/firestore";
 
 //import { db } from "@/app/firebaseConfig"
 
@@ -50,8 +53,7 @@ type Chat = {
 };
 
 async function fetchDataFirestore(
-  userPairId: string, uid: string, rid: string, fetchChats: (uid: string, rid: string, isRealtime: boolean) => Promise<void>, setChats: React.Dispatch<React.SetStateAction<Chat[]>>
-) {
+  userPairId: string, uid: string, rid: string, fetchChats: (uid: string, rid: string, isRealtime: boolean) => Promise<void>, setChats: React.Dispatch<React.SetStateAction<Chat[]>>, db: any) {
   // Reference to the "messages" subcollection
   const messagesRef = collection(db, "messages", userPairId, "message");
 
@@ -69,14 +71,14 @@ async function fetchDataFirestore(
       return;
     }
 
-    console.log("Snapshot received:", querySnapshot);
+    //console.log("Snapshot received:", querySnapshot);
 
     querySnapshot.docChanges().forEach((change) => {
       if (change.type === "added") {
-        const newMessage = { _id: change.doc.id, ...change.doc.data() };
+        //const newMessage = { _id: change.doc.id, ...change.doc.data() };
 
         // Process only newly added messages
-        console.log("New message added:", newMessage);
+        //console.log("New message added:", newMessage);
         fetchChats(uid, rid, true);
 
 
@@ -98,8 +100,9 @@ const ChatWindow = ({
   const [rid, setRid] = useState<string>("");
   const [chats, setChats] = useState<Chat[]>([]);
   const [userPairId, setUserPairId] = useState("");
+  //const [db, setDb] = useState<any>();
 
-
+  const { db } = useAuth();
 
   const chatEndRef = useRef<HTMLDivElement | null>(null); // Ref for the end of the chat
 
@@ -118,7 +121,7 @@ const ChatWindow = ({
       if (response.ok) {
         const result = await response.json();
 
-        console.log(result);
+        //  console.log(result);
 
         // Add only new messages
         if (result.messages && result.messages.length > 0) {
@@ -167,20 +170,25 @@ const ChatWindow = ({
 
 
   useEffect(() => {
-    if (selectedChat) {
+    if (selectedChat && db) {
       const userPairId = uid < rid ? `${uid}-${rid}` : `${rid}-${uid}`;
       fetchChats(uid, rid, false);  // Assuming this fetches the initial messages
 
-      fetchDataFirestore(userPairId, uid, rid, fetchChats, setChats);
+      fetchDataFirestore(userPairId, uid, rid, fetchChats, setChats, db);
 
     }
-  }, [uid, rid]);
+  }, [uid, rid, db]);
 
 
   useEffect(() => {
     // Scroll to bottom whenever chats change
     scrollToBottom();
   }, [chats]);
+
+
+
+
+
 
 
 
@@ -208,7 +216,7 @@ const ChatWindow = ({
       });
       if (response.ok) {
         const result = await response.json();
-        console.log(result);
+        // console.log(result);
         setMessage("");
       }
     } catch (err) {

@@ -4,11 +4,16 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signIn, signOut } from "next-auth/react";
 import React from "react";
+import env from "@beam-australia/react-env";
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState();
+  const [db, setDb] = useState();
 
   const router = useRouter();
 
@@ -63,12 +68,40 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const initFire = async (isMounted) => {
+    try {
+      const response = await fetch("/api/firestore", {
+        method: "POST",
+      });
+      if (response.ok) {
+        const result = await response.json();
+        if (isMounted) {
+          const app = initializeApp(result.firebaseConfig);
+          const db = getFirestore(app);
+          setDb(db);
+          console.log("From Auth: setup fb");
+         
+        }
+      } else {
+        const errorResult = await response.json();
+        console.error(errorResult);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   useEffect(() => {
     userAuthentication();
+    let isMounted = true;
+    initFire(isMounted);
+    return () => {
+      isMounted = false; // Cleanup on unmount
+    };
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, logout, db }}>
       {children}
     </AuthContext.Provider>
   );
