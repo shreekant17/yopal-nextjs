@@ -20,6 +20,7 @@ import { initializeApp } from "firebase/app";
 import { useAuth } from "@/store/auth";
 
 
+
 //import { db } from "@/libs/firestore";
 
 //import { db } from "@/app/firebaseConfig"
@@ -105,6 +106,8 @@ const ChatWindow = ({
   const { db } = useAuth();
 
   const chatEndRef = useRef<HTMLDivElement | null>(null); // Ref for the end of the chat
+
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({});
@@ -209,6 +212,10 @@ const ChatWindow = ({
     formData.append("sender", uid);
     formData.append("receiver", rid);
 
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+
     try {
       const response = await fetch("api/sendMessage", {
         method: "POST",
@@ -248,66 +255,92 @@ const ChatWindow = ({
       </CardHeader>
       <Divider />
       <ScrollShadow hideScrollBar className="h-full">
-        <CardBody className="h-full flex-col gap-3 p-8">
+        <CardBody className="h-full flex-col gap-3 lg:p-8">
           {chats.length > 0 ? (
-            chats.map((chat) =>
-              chat.sender._id === uid ? (
-                <div className="send flex  justify-end received" key={chat._id}>
-                  <Textarea
-                    value={chat.text || ""}
-                    isRequired
-                    className="lg:max-w-sm"
-                    isReadOnly
-                    rows={1}
-                    minRows={1}
-                    endContent={
-                      <div className="absolute bottom-1 right-1 text-xs text-gray-500">
-                        {new Date(chat.createdAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </div>
-                    }
-                  />
-                </div>
-              ) : (
-                <div className="received" key={chat._id}>
-                  <Textarea
-                    value={chat.text || ""}
-                    isRequired
-                    className="max-w-sm"
-                    isReadOnly
-                    rows={1}
-                    minRows={1}
-                    endContent={
-                      <div className="absolute bottom-1 right-1 text-xs text-gray-500">
-                        {new Date(chat.createdAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </div>
-                    }
-                  />
-                </div>
-              ),
-            )
+            chats.map((chat, index) => {
+              // Extract current and previous dates
+              const currentDate = new Date(chat.createdAt).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              });
+
+              const previousDate =
+                index > 0
+                  ? new Date(chats[index - 1].createdAt).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })
+                  : null;
+
+              // Check if it's a new date
+              const isNewDate = currentDate !== previousDate;
+
+              return (
+                <React.Fragment key={chat._id}>
+                  {/* Date Header */}
+                  {isNewDate && (
+                    <div className="text-center text-sm text-gray-500 my-4">
+                      {currentDate}
+                    </div>
+                  )}
+
+                  {/* Chat Message */}
+                  {chat.sender._id === uid ? (
+                    <div className="send flex justify-end received">
+                      <span className="lg:min-w-20 max-w-80 lg:max-w-2xl w-fit p-2 bg-default-100 flex flex-col text-md rounded-2xl rounded-tr-none">
+                        {chat.text || ""}
+                        <small className="align-text-bottom text-pretty text-end text-foreground-400 text-xs">
+                          {new Date(chat.createdAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true, // AM/PM format
+                          })}
+                        </small>
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="received">
+                      <span className="lg:min-w-20 max-w-80 lg:max-w-2xl w-fit p-2 bg-default-100 flex flex-col text-md rounded-2xl rounded-tl-none">
+                        {chat.text || ""}
+                        <small className="align-text-bottom text-pretty text-end text-foreground-400 text-xs">
+                          {new Date(chat.createdAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true, // AM/PM format
+                          })}
+                        </small>
+                      </span>
+                    </div>
+                  )}
+                </React.Fragment>
+              );
+            })
           ) : (
-            <></>
+            <p className="text-center text-gray-500">No messages yet.</p>
           )}
           <div ref={chatEndRef} />
         </CardBody>
+
       </ScrollShadow>
       <CardFooter>
-        <Form className="p-4 h-min w-full space-y-4" onSubmit={sendMessage}>
+        <Form
+          className="p-4 h-min w-full space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault(); // Prevent default form submission behavior
+            sendMessage(e); // Your send message logic
+          }}
+        >
           <div className="flex items-end w-full">
             <Input
-
               isRequired
               className="flex-grow"
               placeholder="Write a message..."
               name="text"
               value={message}
               onChange={(e: any) => setMessage(e.target.value)}
+              ref={inputRef}  // Ensure the input remains focused
             />
             <Button
               isIconOnly
@@ -321,6 +354,7 @@ const ChatWindow = ({
           </div>
         </Form>
       </CardFooter>
+
     </Card>
   );
 };

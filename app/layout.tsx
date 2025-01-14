@@ -48,7 +48,7 @@ export default function RootLayout({
             <div className="relative flex flex-col h-screen">
               <SessionWrapper>
                 <Navbar />
-                <main className="container max-w-none w-screen  flex-grow">
+                <main className="container max-w-none   flex-grow">
                   {children}
                 </main>
               </SessionWrapper>
