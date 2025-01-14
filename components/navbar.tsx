@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/store/auth";
-
+import { disableNav } from "@/libs/disableNav"
 import {
   Avatar,
   Dropdown,
@@ -51,6 +51,8 @@ import { Router } from "next/router";
 import { SessionUser } from "@/types";
 import { UserSession } from "@/types";
 import React from "react";
+import { usePathname } from "next/navigation"
+
 
 export const Navbar = () => {
   const { logout } = useAuth();
@@ -59,6 +61,10 @@ export const Navbar = () => {
   const [avatar, setAvatar] = useState<string>();
   const { data: session, status } = useSession();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+
+  const path = usePathname()
+
+
   useEffect(() => {
     if (session) {
       const { fname, avatar } = session?.user as SessionUser;
@@ -92,204 +98,215 @@ export const Navbar = () => {
   );
 
   return (
-    <NextUINavbar
-      maxWidth="xl"
-      position="sticky"
-      isMenuOpen={isMenuOpen}
-      onMenuOpenChange={setIsMenuOpen}
-    >
-      <UploadPost isOpen={isOpen} onClose={onClose} />
 
-      <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-        <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink
-            className="flex justify-start items-center gap-1"
-            href="/"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            <Image
-              radius={"full"}
-              alt={"logo"}
-              src={"yplexity-transparent.png"}
-              width={30}
-            />
-            <p className="font-bold text-inherit">YplexitY</p>
-          </NextLink>
-        </NavbarBrand>
-        <ul className="hidden lg:flex gap-4 justify-start ml-2">
-          {siteConfig.navItems.map((item) => (
-            <NavbarItem key={item.href}>
+    <>
+      {!disableNav.includes(path) && (
+        <NextUINavbar
+          maxWidth="xl"
+          position="sticky"
+          isMenuOpen={isMenuOpen}
+          onMenuOpenChange={setIsMenuOpen}
+        >
+
+          <UploadPost isOpen={isOpen} onClose={onClose} />
+
+
+
+          <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
+            <NavbarBrand as="li" className="gap-3 max-w-fit">
               <NextLink
-                className={clsx(
-                  linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium",
-                )}
-                color="foreground"
-                href={item.href}
+                className="flex justify-start items-center gap-1"
+                href="/"
+                onClick={() => setIsMenuOpen(false)}
               >
-                {item.label}
+                <Image
+                  radius={"full"}
+                  alt={"logo"}
+                  src={"yplexity-transparent.png"}
+                  width={30}
+                />
+                <p className="font-bold text-inherit">YplexitY</p>
               </NextLink>
-            </NavbarItem>
-          ))}
-        </ul>
-      </NavbarContent>
-
-      <NavbarContent
-        className="hidden sm:flex basis-1/5 sm:basis-full"
-        justify="end"
-      >
-        <NavbarItem className="hidden sm:flex gap-2">
-          <Button isIconOnly onPress={onOpen}>
-            <PlusIcon />
-          </Button>
-          <ThemeSwitch />
-        </NavbarItem>
-        <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-        <NavbarItem className="hidden md:flex">
-          {status === "authenticated" ? (
-            <NavbarContent as="div" justify="end" className="hidden lg:flex">
-              <Dropdown placement="bottom-end">
-                <DropdownTrigger>
-                  <Button
-                    className="text-sm font-normal text-default-600 bg-default-100"
-                    startContent={
-                      <Image
-                        radius="full"
-                        className="object-cover w-8 h-8 opacity-100"
-                        src={avatar}
-                      />
-                    }
-                    variant="flat"
+            </NavbarBrand>
+            <ul className="hidden lg:flex gap-4 justify-start ml-2">
+              {siteConfig.navItems.map((item) => (
+                <NavbarItem key={item.href}>
+                  <NextLink
+                    className={clsx(
+                      linkStyles({ color: "foreground" }),
+                      "data-[active=true]:text-primary data-[active=true]:font-medium",
+                    )}
+                    color="foreground"
+                    href={item.href}
                   >
-                    {fname}
-                  </Button>
-                </DropdownTrigger>
-                <DropdownMenu aria-label="Profile Actions" variant="flat">
-                  <DropdownItem key="profile" className="h-14 gap-2">
-                    <p className="font-semibold">Signed in as</p>
-                    <p className="font-semibold">{session?.user?.email}</p>
-                  </DropdownItem>
-                  <DropdownItem key="settings" as={Link} href={"/account"}>
-                    My Account
-                  </DropdownItem>
-                  <DropdownItem key="chat" as={Link} href={"/chat"}>
-                    Chat
-                  </DropdownItem>
+                    {item.label}
+                  </NextLink>
+                </NavbarItem>
+              ))}
+            </ul>
+          </NavbarContent>
 
-                  <DropdownItem key="help_and_feedback">
-                    Help & Feedback
-                  </DropdownItem>
-                  <DropdownItem key="logout" color="danger" onPress={logout}>
-                    Log Out
-                  </DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
-            </NavbarContent>
-          ) : (
-            <Button
-              as={Link}
-              className="text-sm font-normal text-default-600 bg-default-100"
-              href={"/login"}
-              startContent={<UserIcon />}
-              variant="flat"
-            >
-              Sign In
-            </Button>
-          )}
-        </NavbarItem>
-      </NavbarContent>
-
-      <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
-        <ThemeSwitch />
-        {status === "authenticated" && (
-          <Button isIconOnly color="danger" onPress={onOpen}>
-            <PlusIcon />
-          </Button>
-        )}
-
-        {status === "authenticated" ? (
-          <Button
-            isIconOnly
-            radius="full"
-            color="danger"
-            className="text-sm font-normal text-default-600 bg-default-100"
-            onPress={() => setIsMenuOpen(!isMenuOpen)}
-            startContent={
-              <Image
-                radius="full"
-                className="object-cover opacity-100"
-                src={avatar}
-              />
-            }
-            variant="flat"
-          ></Button>
-        ) : (
-          <Button
-            isIconOnly
-            onPress={() => {
-              router.push("/login");
-            }}
+          <NavbarContent
+            className="hidden sm:flex basis-1/5 sm:basis-full"
+            justify="end"
           >
-            <UserIcon />
-          </Button>
-        )}
-      </NavbarContent>
+            <NavbarItem className="hidden sm:flex gap-2">
+              <Button isIconOnly onPress={onOpen}>
+                <PlusIcon />
+              </Button>
+              <ThemeSwitch />
+            </NavbarItem>
+            <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
+            <NavbarItem className="hidden md:flex">
+              {status === "authenticated" ? (
+                <NavbarContent as="div" justify="end" className="hidden lg:flex">
+                  <Dropdown placement="bottom-end">
+                    <DropdownTrigger>
+                      <Button
+                        className="text-sm font-normal text-default-600 bg-default-100"
+                        startContent={
+                          <Image
+                            radius="full"
+                            className="object-cover w-8 h-8 opacity-100"
+                            src={avatar}
+                          />
+                        }
+                        variant="flat"
+                      >
+                        {fname}
+                      </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu aria-label="Profile Actions" variant="flat">
+                      <DropdownItem key="profile" className="h-14 gap-2">
+                        <p className="font-semibold">Signed in as</p>
+                        <p className="font-semibold">{session?.user?.email}</p>
+                      </DropdownItem>
+                      <DropdownItem key="settings" as={Link} href={"/account"}>
+                        My Account
+                      </DropdownItem>
+                      <DropdownItem key="chat" as={Link} href={"/chat"}>
+                        Chat
+                      </DropdownItem>
 
-      <NavbarMenu>
-        {searchInput}
-        <div className="mx-4 mt-2 flex flex-col gap-2">
-          <NavbarMenuItem>
-            <Link
-              size="lg"
-              href="/account"
-              color={"foreground"}
-              onPress={() => setIsMenuOpen(false)}
-            >
-              Account
-            </Link>
-          </NavbarMenuItem>
-          <NavbarMenuItem>
-            <Link
-              size="lg"
-              href="/feed"
-              color={"foreground"}
-              onPress={() => setIsMenuOpen(false)}
-            >
-              Feed
-            </Link>
-          </NavbarMenuItem>
-          <NavbarMenuItem>
-            <Link
-              size="lg"
-              href="/chat"
-              color={"foreground"}
-              onPress={() => setIsMenuOpen(false)}
-            >
-              Chat
-            </Link>
-          </NavbarMenuItem>
-          {siteConfig.navMenuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`}>
-              <Link color={"foreground"} href="#" size="lg">
-                {item.label}
-              </Link>
-            </NavbarMenuItem>
-          ))}
-          <NavbarMenuItem>
-            <Link
-              color="danger"
-              size="lg"
-              href="#"
-              onPress={() => {
-                logout();
-                setIsMenuOpen(false);
-              }}
-            >
-              Logout
-            </Link>
-          </NavbarMenuItem>
-        </div>
-      </NavbarMenu>
-    </NextUINavbar>
+                      <DropdownItem key="help_and_feedback">
+                        Help & Feedback
+                      </DropdownItem>
+                      <DropdownItem key="logout" color="danger" onPress={logout}>
+                        Log Out
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                </NavbarContent>
+              ) : (
+                <Button
+                  as={Link}
+                  className="text-sm font-normal text-default-600 bg-default-100"
+                  href={"/login"}
+                  startContent={<UserIcon />}
+                  variant="flat"
+                >
+                  Sign In
+                </Button>
+              )}
+            </NavbarItem>
+          </NavbarContent>
+
+          <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
+            <ThemeSwitch />
+            {status === "authenticated" && (
+              <Button isIconOnly color="danger" onPress={onOpen}>
+                <PlusIcon />
+              </Button>
+            )}
+
+            {status === "authenticated" ? (
+              <Button
+                isIconOnly
+                radius="full"
+                color="danger"
+                className="text-sm font-normal text-default-600 bg-default-100"
+                onPress={() => setIsMenuOpen(!isMenuOpen)}
+                startContent={
+                  <Image
+                    radius="full"
+                    className="object-cover opacity-100"
+                    src={avatar}
+                  />
+                }
+                variant="flat"
+              ></Button>
+            ) : (
+              <Button
+                isIconOnly
+                onPress={() => {
+                  router.push("/login");
+                }}
+              >
+                <UserIcon />
+              </Button>
+            )}
+          </NavbarContent>
+
+          <NavbarMenu>
+            {searchInput}
+            <div className="mx-4 mt-2 flex flex-col gap-2">
+              <NavbarMenuItem>
+                <Link
+                  size="lg"
+                  href="/account"
+                  color={"foreground"}
+                  onPress={() => setIsMenuOpen(false)}
+                >
+                  Account
+                </Link>
+              </NavbarMenuItem>
+              <NavbarMenuItem>
+                <Link
+                  size="lg"
+                  href="/feed"
+                  color={"foreground"}
+                  onPress={() => setIsMenuOpen(false)}
+                >
+                  Feed
+                </Link>
+              </NavbarMenuItem>
+              <NavbarMenuItem>
+                <Link
+                  size="lg"
+                  href="/chat"
+                  color={"foreground"}
+                  onPress={() => setIsMenuOpen(false)}
+                >
+                  Chat
+                </Link>
+              </NavbarMenuItem>
+              {siteConfig.navMenuItems.map((item, index) => (
+                <NavbarMenuItem key={`${item}-${index}`}>
+                  <Link color={"foreground"} href="#" size="lg">
+                    {item.label}
+                  </Link>
+                </NavbarMenuItem>
+              ))}
+              <NavbarMenuItem>
+                <Link
+                  color="danger"
+                  size="lg"
+                  href="#"
+                  onPress={() => {
+                    logout();
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Logout
+                </Link>
+              </NavbarMenuItem>
+            </div>
+          </NavbarMenu>
+        </NextUINavbar>
+      )}
+
+    </>
+
   );
+
 };

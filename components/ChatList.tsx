@@ -4,24 +4,37 @@ import {
   CardBody,
   CardHeader,
   Input,
+  NavbarBrand,
   User,
+  Image,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Dropdown,
+
 } from "@nextui-org/react";
 import { Divider } from "@nextui-org/divider";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { ChatType } from "@/types";
 import { SearchIcon } from "@/components/icons";
-
+import NextLink from "next/link";
+import Link from "next/link";
+import { ThreeDots } from "./ThreeDots";
 type ChatListProps = {
   userId: string;
   setSelectedChat: (chat: ChatType | null) => void; // New prop to pass selected chat to parent
 };
 
+
+import { useAuth } from "@/store/auth";
+import { ThemeSwitch } from "@/components/theme-switch";
+
 const ChatList = ({ userId, setSelectedChat }: ChatListProps) => {
   const [chatList, setChatList] = useState<ChatType[]>([]);
   const [searchResults, setSearchResults] = useState<ChatType[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-
+  const { logout } = useAuth();
   const fetchChatList = async () => {
     try {
       const response = await fetch("/api/fetchChatList", {
@@ -91,8 +104,53 @@ const ChatList = ({ userId, setSelectedChat }: ChatListProps) => {
   };
 
   return (
-    <Card className="w-full h-full p-0">
-      <CardHeader>
+
+    <Card className="w-full h-[100vh] p-0">
+      <CardHeader className="flex flex-col w-full">
+        <div className="flex justify-between w-full">
+
+          <Link
+            className="flex justify-start items-center gap-1"
+            href="/"
+
+          >
+            <Image
+              radius={"full"}
+              alt={"logo"}
+              src={"yplexity-transparent.png"}
+              width={30}
+            />
+            <p className="font-bold text-inherit">YplexitY</p>
+          </Link>
+          <div className="flex">
+
+            <ThemeSwitch />
+            <Dropdown>
+              <DropdownTrigger>
+                <Button
+                  className="border-none"
+                  radius="full"
+                  isIconOnly
+                  variant="bordered"
+                >
+                  <ThreeDots />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu aria-label="Static Actions">
+                <DropdownItem key="account" href="/account">Account</DropdownItem>
+                <DropdownItem key="edit"
+                  className="text-danger"
+                  color="danger"
+                  onPress={logout}
+                >
+                  Logout
+                </DropdownItem>
+
+              </DropdownMenu>
+            </Dropdown>
+          </div>
+        </div>
+
         <Input
           aria-label="Search"
           classNames={{
@@ -111,7 +169,7 @@ const ChatList = ({ userId, setSelectedChat }: ChatListProps) => {
       </CardHeader>
       <Divider />
 
-      <CardBody className=" p-0">
+      <CardBody className="h-full p-0">
         {searchResults.length > 0 && (
           <div className=" bg-white shadow-lg w-full rounded-md">
             {searchResults.map((user) => (

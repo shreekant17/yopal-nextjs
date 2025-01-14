@@ -227,7 +227,7 @@ const ChatWindow = ({
 
 
   return (
-    <Card className="w-full h-full">
+    <Card className="w-full h-[100vh]">
       <CardHeader className="flex align-center">
         <Button
           isIconOnly
@@ -247,7 +247,7 @@ const ChatWindow = ({
         />
       </CardHeader>
       <Divider />
-      <ScrollShadow hideScrollBar className="h-[70vh]">
+      <ScrollShadow hideScrollBar className="h-full">
         <CardBody className="h-full flex-col gap-3 p-8">
           {chats.length > 0 ? (
             chats.map((chat) =>
