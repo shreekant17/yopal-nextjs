@@ -111,16 +111,18 @@ const ChatList = ({ userId, setSelectedChat }: ChatListProps) => {
       </CardHeader>
       <Divider />
 
-      <CardBody className="gap-4 p-0">
+      <CardBody className=" p-0">
         {searchResults.length > 0 && (
           <div className=" bg-white shadow-lg w-full rounded-md">
             {searchResults.map((user) => (
-              <div
+              <Button
                 key={user.userId}
-                className="p-2 hover:bg-gray-100 cursor-pointer"
-                onClick={() => handleChatClick(user)}
+                className="user w-full border-none h-max cursor-pointer p-4 flex justify-between align-top"
+                onPress={() => handleChatClick(user)}
                 onKeyDown={(e) => e.key === "Enter" && handleChatClick(user)}
-                role="button"
+                radius="none"
+                color="default"
+                variant="ghost"
 
               >
                 <User
@@ -128,7 +130,7 @@ const ChatList = ({ userId, setSelectedChat }: ChatListProps) => {
                   name={user.fname}
                   description={user.latestMessage?.text || "No recent messages"}
                 />
-              </div>
+              </Button>
             ))}
           </div>
         )}
@@ -162,7 +164,7 @@ const ChatList = ({ userId, setSelectedChat }: ChatListProps) => {
                     )}
                   </div>
                 </Button>
-                {index !== chatList.length - 1 && <Divider className="m-0" />}
+
               </div>
             ))}
           </>
