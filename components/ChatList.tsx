@@ -171,7 +171,7 @@ const ChatList = ({ userId, setSelectedChat }: ChatListProps) => {
 
       <CardBody className="h-full p-0">
         {searchResults.length > 0 && (
-          <div className=" bg-white shadow-lg w-full rounded-md">
+          <div className=" bg-none shadow-lg w-full rounded-md">
             {searchResults.map((user) => (
               <Button
                 key={user.userId}

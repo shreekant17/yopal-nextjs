@@ -10,16 +10,16 @@ import { GithubIcon } from "@/components/icons";
 
 export default function Home() {
   return (
-    <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
+    <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10 pt-16">
       <div className="inline-block max-w-xl text-center justify-center">
-        <span className={title()}>Make&nbsp;</span>
-        <span className={title({ color: "violet" })}>beautiful&nbsp;</span>
+        <span className={title()}> Welcome&nbsp;</span>
+        <span className={title({ color: "violet" })}>Aboard!&nbsp;</span>
         <br />
         <span className={title()}>
-          connections regardless of your experience.
+          We’re delighted to have you here. Explore, connect, and make the most of what we have to offer.
         </span>
         <div className={subtitle({ class: "mt-4" })}>
-          Built on Next UI Beautiful, fast and modern React UI library.
+          This is your space to grow and thrive.
         </div>
       </div>
 

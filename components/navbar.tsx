@@ -188,6 +188,10 @@ export const Navbar = () => {
                         Chat
                       </DropdownItem>
 
+                      <DropdownItem key="feed" as={Link} href={"/feed"}>
+                        Feed
+                      </DropdownItem>
+
                       <DropdownItem key="help_and_feedback">
                         Help & Feedback
                       </DropdownItem>
@@ -214,7 +218,7 @@ export const Navbar = () => {
           <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
             <ThemeSwitch />
             {status === "authenticated" && (
-              <Button isIconOnly color="danger" onPress={onOpen}>
+              <Button isIconOnly onPress={onOpen}>
                 <PlusIcon />
               </Button>
             )}

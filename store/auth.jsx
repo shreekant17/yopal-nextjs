@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }) => {
           const app = initializeApp(result.firebaseConfig);
           const db = getFirestore(app);
           setDb(db);
-          console.log("From Auth: setup fb");
+         // console.log("From Auth: setup fb");
          
         }
       } else {
