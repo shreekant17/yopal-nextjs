@@ -212,15 +212,13 @@ const ChatList = ({ userId, setSelectedChat }: ChatListProps) => {
                     }
                     name={chat.fname}
                   />
-                  <div className="absolute bottom-1 right-1 text-xs text-gray-500">
-                    {new Date(chat.latestMessage.createdAt).toLocaleTimeString(
-                      [],
-                      {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      },
-                    )}
-                  </div>
+                  <small className="align-text-bottom text-pretty text-end text-foreground-400 text-xs">
+                    {new Date(chat.latestMessage.createdAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: true, // AM/PM format
+                    })}
+                  </small>
                 </Button>
 
               </div>

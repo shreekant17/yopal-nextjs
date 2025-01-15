@@ -33,18 +33,8 @@ type ChatWindowProps = {
 
 type Chat = {
   _id: string;
-  sender: {
-    _id: string;
-    fname: string;
-    lname: string;
-    avatar: string;
-  };
-  receiver: {
-    _id: string;
-    fname: string;
-    lname: string;
-    avatar: string;
-  };
+  sender: string;
+  receiver: string;
   text: string;
   status: string;
   attachments: string[];
@@ -59,7 +49,7 @@ async function fetchDataFirestore(
   const messagesRef = collection(db, "messages", userPairId, "message");
 
   // Query with ordering by timestamp in ascending order
-  const messagesQuery = query(messagesRef, orderBy("timestamp", "asc"));
+  const messagesQuery = query(messagesRef, orderBy("createdAt", "asc"));
 
   // Flag to skip the initial load
   let isInitialLoad = true;
@@ -76,11 +66,13 @@ async function fetchDataFirestore(
 
     querySnapshot.docChanges().forEach((change) => {
       if (change.type === "added") {
-        //const newMessage = { _id: change.doc.id, ...change.doc.data() };
+        const newMessage = { ...change.doc.data() };
 
         // Process only newly added messages
         //console.log("New message added:", newMessage);
-        fetchChats(uid, rid, true);
+        setChats((prevChats) => [...prevChats, { ...newMessage } as Chat]);
+
+        //fetchChats(uid, rid, true);
 
 
         // Optionally call fetchChats if needed
@@ -128,24 +120,9 @@ const ChatWindow = ({
 
         // Add only new messages
         if (result.messages && result.messages.length > 0) {
-          if (isRealtime) {
-            setChats((prevChats: Chat[]) => {
-              // Get IDs of current messages in state
-              const existingIds = new Set(prevChats.map((chat) => chat._id));
 
-              // Filter messages that are not already in the state
-              const newMessages = result.messages.filter(
-                (message: Chat) => !existingIds.has(message._id)
-              );
+          setChats(result.messages);
 
-              // Return the updated chat array with new messages
-              return [...prevChats, ...newMessages];
-            });
-
-          } else {
-
-            setChats(result.messages);
-          }
 
 
 
@@ -287,7 +264,7 @@ const ChatWindow = ({
                   )}
 
                   {/* Chat Message */}
-                  {chat.sender._id === uid ? (
+                  {chat.sender === uid ? (
                     <div className="send flex justify-end received">
                       <span className="lg:min-w-20 max-w-80 lg:max-w-2xl w-fit p-2 bg-default-100 flex flex-col text-md rounded-2xl rounded-tr-none">
                         {chat.text || ""}

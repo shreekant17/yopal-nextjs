@@ -31,16 +31,17 @@ export async function POST(req) {
       .sort({ createdAt: 1 }) // Sort messages by creation date
       .exec();
 
+    /*
     // Populate sender and receiver details if required (optional)
     const populatedMessages = await Message.populate(messages, {
       path: "sender receiver",
       select: "fname lname avatar", // Include only required fields
     });
-
+    */
     return NextResponse.json(
       {
         message: "Fetched chatted users and latest chats",
-        messages: populatedMessages,
+        messages: messages,
       },
       { status: 200 },
     );

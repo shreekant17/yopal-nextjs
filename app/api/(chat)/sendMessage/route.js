@@ -22,11 +22,11 @@ export async function POST(req) {
     // Save message in MongoDB
     await connectMongoDB();
     const message = { sender, receiver, text };
-    await Message.create(message);
+    const sentMessage = await Message.create(message);
+    const messageJson = sentMessage.toJSON(); // Convert Mongoose document to plain JSON
 
     // Save message in Firestore
     const userPairId = sender < receiver ? `${sender}-${receiver}` : `${receiver}-${sender}`; // Create userPairId
-
     const messagesCollectionRef = collection(db, "messages");
 
     // Reference to the document for the specific userPairId
@@ -37,13 +37,15 @@ export async function POST(req) {
 
     // Add a new message as a separate document in the "message" subcollection
     await addDoc(messageCollectionRef, {
-      sender,
-      receiver,
-      text,
-      timestamp: new Date().toISOString(),
+      _id: messageJson._id.toString(),
+      sender: messageJson.sender.toString(),
+      receiver: messageJson.receiver.toString(),
+      text: messageJson.text,
+      createdAt: new Date(messageJson.createdAt).toISOString(), // Set timestamp for Firestore
     });
 
     return NextResponse.json({ message: "Message Sent" }, { status: 200 });
+
   } catch (error) {
     console.error("Error sending message:", error);
     return NextResponse.json(
