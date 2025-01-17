@@ -231,7 +231,7 @@ const ChatWindow = ({
 
 
   return (
-    <Card className="w-full lg:h-[100vh] h-[100svh]"  >
+    <Card className="w-full lg:h-[100vh] h-[100svh] rounded-none"   >
 
       <CardHeader className="flex align-center">
         <Button
