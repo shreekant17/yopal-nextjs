@@ -7,6 +7,7 @@ import {
   Divider,
   Form,
   Input,
+  Link,
   ScrollShadow,
   Textarea,
   User,
@@ -93,13 +94,29 @@ const ChatWindow = ({
   const [rid, setRid] = useState<string>("");
   const [chats, setChats] = useState<Chat[]>([]);
   const [userPairId, setUserPairId] = useState("");
+  const [isKeyBoardOpened, setIsKeyBoardOpened] = useState(false);
+  const [groundHeight, setGroundHeight] = useState("[100vh]");
+
+  /*
+    useEffect(() => {
+      if (isKeyBoardOpened) {
+        setGroundHeight("[" + (window.outerHeight) + "px]");
+        console.log(window.outerHeight);
+      } else {
+        setGroundHeight("[100vh]")
+        console.log(window.outerHeight);
+      }
+    }, [isKeyBoardOpened])
+    */
+
   //const [db, setDb] = useState<any>();
 
   const { db } = useAuth();
 
   const chatEndRef = useRef<HTMLDivElement | null>(null); // Ref for the end of the chat
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
 
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({});
@@ -124,13 +141,14 @@ const ChatWindow = ({
           setChats(result.messages);
 
 
-
-
+        } else {
+          setChats([]);
         }
       } else {
         // Handle errors if the response isn't OK
         const result = await response.json();
         console.error("Error fetching chats:", result);
+        setChats([]);
       }
     } catch (err) {
       console.error("Error in fetchChats:", err);
@@ -163,7 +181,7 @@ const ChatWindow = ({
   useEffect(() => {
     // Scroll to bottom whenever chats change
     scrollToBottom();
-  }, [chats]);
+  }, [chats, selectedChat]);
 
 
 
@@ -182,21 +200,23 @@ const ChatWindow = ({
     );
   }
 
-  const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+  const sendMessage = async () => {
+    //e.preventDefault();
+    //const formData = new FormData(e.currentTarget);
 
+    /*
     formData.append("sender", uid);
     formData.append("receiver", rid);
+    */
 
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
+    //inputRef?.current?.focus();
+
+
 
     try {
       const response = await fetch("api/sendMessage", {
         method: "POST",
-        body: formData,
+        body: JSON.stringify({ sender: uid, receiver: rid, text: message }),
       });
       if (response.ok) {
         const result = await response.json();
@@ -211,7 +231,8 @@ const ChatWindow = ({
 
 
   return (
-    <Card className="w-full h-[100vh]">
+    <Card className="w-full lg:h-[100vh] h-[100svh]"  >
+
       <CardHeader className="flex align-center">
         <Button
           isIconOnly
@@ -231,7 +252,7 @@ const ChatWindow = ({
         />
       </CardHeader>
       <Divider />
-      <ScrollShadow hideScrollBar className="h-full">
+      <ScrollShadow hideScrollBar className={`h-${"full"}`}>
         <CardBody className="h-full flex-col gap-3 lg:p-8">
           {chats.length > 0 ? (
             chats.map((chat, index) => {
@@ -304,27 +325,48 @@ const ChatWindow = ({
       <CardFooter>
         <Form
           className="p-4 h-min w-full space-y-4"
+
           onSubmit={(e) => {
             e.preventDefault(); // Prevent default form submission behavior
-            sendMessage(e); // Your send message logic
+            sendMessage(); // Your send message logic
           }}
         >
+
           <div className="flex items-end w-full">
-            <Input
+            <Textarea
               isRequired
+              rows={1} // Ensures it starts with 1 row
+              minRows={1} // Prevents it from shrinking below 1 row
               className="flex-grow"
+
               placeholder="Write a message..."
               name="text"
               value={message}
+              onFocus={() => {
+
+                setIsKeyBoardOpened(true)
+              }}
+              onBlur={() => {
+                inputRef.current?.focus()
+                setIsKeyBoardOpened(false)
+              }}
               onChange={(e: any) => setMessage(e.target.value)}
               ref={inputRef}  // Ensure the input remains focused
+
             />
             <Button
+
               isIconOnly
               radius="full"
               color="danger"
-              type="submit"
               className="ml-2"
+              onPress={() => {
+                sendMessage();
+                setTimeout(() => {
+                  // inputRef.current?.focus(); // Keep focus on the input field
+                }, 100); // Adjust delay if needed
+
+              }}
             >
               <SendIcon />
             </Button>
@@ -332,7 +374,7 @@ const ChatWindow = ({
         </Form>
       </CardFooter>
 
-    </Card>
+    </Card >
   );
 };
 

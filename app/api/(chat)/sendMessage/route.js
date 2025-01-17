@@ -7,10 +7,15 @@ import { doc, updateDoc, arrayUnion, collection, addDoc, setDoc } from "firebase
 
 export async function POST(req) {
   try {
+
+    /*
     const data = await req.formData();
     const sender = data.get("sender");
     const receiver = data.get("receiver");
     const text = data.get("text");
+    */
+
+    const { sender, receiver, text } = await req.json();
 
     if (!sender || !receiver) {
       return NextResponse.json(

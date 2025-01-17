@@ -143,11 +143,11 @@ const CommentBox = ({ isOpen, onClose, postId }: CommentProps) => {
                           name={comment.userDetails?.fname || "Anonymous"}
                         />
                       </div>
-                      <Textarea
-                        isReadOnly
-                        className=" w-full h-content  p-2 rounded-lg  text-sm "
-                        value={comment.comments.text || "No content"}
-                      />
+                      <span className="lg:min-w-20  w-fit m-2 p-2 bg-default-100 flex flex-col text-md rounded-2xl rounded-tl-none">
+                        {comment.comments.text || ""}
+
+                      </span>
+
                     </div>
                   ))
                 ) : (

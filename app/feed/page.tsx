@@ -168,7 +168,7 @@ const Feed: React.FC = () => {
               <Image
                 radius="none"
                 alt="Post image"
-                className="object-cover lg:w-[500px] w-screen"
+                className="object-cover lg:w-[500px] w-screen max-h-[500px]"
                 src={post.media}
               />
             </CardBody>

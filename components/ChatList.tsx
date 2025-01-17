@@ -105,7 +105,7 @@ const ChatList = ({ userId, setSelectedChat }: ChatListProps) => {
 
   return (
 
-    <Card className="w-full h-[100vh] p-0">
+    <Card className="w-full h-[100svh] p-0">
       <CardHeader className="flex flex-col w-full">
         <div className="flex justify-between w-full">
 
