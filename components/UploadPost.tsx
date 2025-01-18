@@ -18,6 +18,7 @@ import {
 } from "@nextui-org/react";
 import { toast } from "react-toastify";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 // Typing for the props passed to the UploadPost component
 type UploadPostProps = {
@@ -35,6 +36,7 @@ interface SessionUser {
 const UploadPost = ({ isOpen, onClose }: UploadPostProps) => {
   const size = "lg";
 
+  const router = useRouter();
   // Typing the state variables
   const [btnStatus, setBtnStatus] = React.useState<boolean>(true);
   const [submitted, setSubmitted] = React.useState<any>(null);
@@ -72,6 +74,7 @@ const UploadPost = ({ isOpen, onClose }: UploadPostProps) => {
       });
       if (res.ok) {
         toast.success("Post created successfully!");
+        router.push("/feed");
       } else {
         const error = await res.json();
         toast.error(error.Message);
@@ -108,7 +111,7 @@ const UploadPost = ({ isOpen, onClose }: UploadPostProps) => {
                 <div className="flex flex-col gap-4 max-w-md">
                   {imagePreview && (
                     <Image
-                      alt="NextUI hero Image with delay"
+                      alt=""
                       src={imagePreview}
                       height={300}
                       width={300}

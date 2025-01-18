@@ -16,6 +16,9 @@ const postSchema = new mongoose.Schema({
   media: {
     type: String, // URLs to media files (images, videos)
   },
+  public_id: {
+    type: String,
+  },
   likes: [
     {
       type: mongoose.Schema.Types.ObjectId,

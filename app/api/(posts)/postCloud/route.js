@@ -46,7 +46,10 @@ export const POST = async (req) => {
 
       const result = await uploadToCloudinary();
 
+      //console.log(result);
+
       const imageUrl = result.secure_url;
+      const public_id = result.public_id;
 
       const user = verifyToken(token);
       const email = user.email;
@@ -59,7 +62,11 @@ export const POST = async (req) => {
         content: content,
         type: type,
         media: media,
+        public_id: public_id,
       };
+
+
+
       await connectMongoDB();
       await Post.create(post);
 

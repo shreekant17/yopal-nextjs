@@ -114,6 +114,23 @@ const Feed: React.FC = () => {
     }
   };
 
+  const handleDelete = async (postId: string) => {
+    try {
+      const response = await fetch("api/delete", {
+        method: "POST",
+        body: JSON.stringify({ postId, token })
+      });
+      if (response.ok) {
+        console.log("Post deleted");
+        getAllPosts(userId);
+      } else {
+        console.log("Something went wrong");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   // Fetch posts when the component mounts
   useEffect(() => {
     const storedUserId = (session?.user as SessionUser)?.id || "";
@@ -148,19 +165,23 @@ const Feed: React.FC = () => {
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Static Actions">
                   <DropdownItem key="shre">Share Post</DropdownItem>
-                  <DropdownItem key="edit">Edit Post</DropdownItem>
                   {userId === post.user._id ? (
-                    <DropdownItem
-                      key="delete"
-                      className="text-danger"
-                      color="danger"
-                    >
-                      Delete Post
-                    </DropdownItem>
-                  ) : (
-                    <></>
-                  )}
+                    <>
+                      <DropdownItem key="edit">Edit Post</DropdownItem>
+                      <DropdownItem
+                        key="delete"
+                        className="text-danger"
+                        color="danger"
+                        onPress={() => {
+                          handleDelete(post._id);
+                        }}
+                      >
+                        Delete Post
+                      </DropdownItem>
+                    </>
+                  ) : null}
                 </DropdownMenu>
+
               </Dropdown>
             </CardHeader>
             <Divider />
@@ -223,8 +244,8 @@ const Feed: React.FC = () => {
                     {post.likes.length === 1
                       ? `liked by ${post.likers[0].fname}`
                       : post.likes.length === 2
-                        ? `liked by ${post.likers[0].fname} and ${count - 1} other`
-                        : `liked by ${post.likers[0].fname} and ${count - 1} others`}
+                        ? `liked by ${post.likers[post.likes.length - 1].fname} and ${count - 1} other`
+                        : `liked by ${post.likers[post.likes.length - 1].fname} and ${count - 1} others`}
                   </p>
                 )}
                 total={post.likes.length}
