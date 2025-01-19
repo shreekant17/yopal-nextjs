@@ -33,6 +33,7 @@ export interface SessionUser {
   fname?: string; // Other properties, if applicable
   lname?: string; // Other properties, if applicable
   email?: string; // Other properties, if applicable
+  username?: string; // Other properties, if applicable
   avatar?: string;
   country?: string;
   jwtToken?: string; // Other properties, if applicable
@@ -42,6 +43,7 @@ export type UserSession = {
   fname?: string; // Other properties, if applicable
   lname?: string; // Other properties, if applicable
   email?: string; // Other properties, if applicable
+  username?: string;
   avatar?: string;
   country?: string;
   jwtToken?: string; // Other properties, if applicable

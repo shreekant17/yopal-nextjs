@@ -22,6 +22,11 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     trim: true,
   },
+  username: {
+    type: String,
+    unique: true, // Ensures that the username is unique
+    default: Date.now().toString(),
+  },
   password: {
     type: String,
     required: true,

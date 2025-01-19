@@ -7,6 +7,10 @@ const postSchema = new mongoose.Schema({
     lowercase: true,
     trim: true,
   },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
   content: {
     type: String,
     trim: true,

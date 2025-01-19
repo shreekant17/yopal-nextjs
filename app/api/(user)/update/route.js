@@ -27,7 +27,7 @@ export const POST = async (req) => {
     }
 
     // Validate required fields
-    const requiredFields = ["id", "email", "fname", "lname", "country"];
+    const requiredFields = ["id", "email", "username", "fname", "lname", "country"];
     for (const field of requiredFields) {
       if (!data.get(field)) {
         return NextResponse.json(
@@ -66,19 +66,34 @@ export const POST = async (req) => {
       );
     }
 
-    existingUser.fname = data.get("fname");
-    existingUser.lname = data.get("lname");
-    existingUser.email = data.get("email");
-    existingUser.country = data.get("country");
+    // Create a new user instance
+    const updatedFields = {
+      fname: data.get("fname"),
+      lname: data.get("lname"),
+      email: data.get("email"),
+      username: data.get("username"),
+      country: data.get("country"),
+    };
 
-    console.log(existingUser);
-
-    // Update avatar only if image is uploaded
+    // Update avatar only if imageUrl is provided
     if (imageUrl) {
-      existingUser.avatar = imageUrl;
+      updatedFields.avatar = imageUrl;
     }
 
-    await existingUser.save();
+    console.log(updatedFields)
+
+    // Update the user in the database
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { $set: updatedFields },
+      {
+        new: true, // Return the updated document
+        runValidators: true, // Validate updated fields
+        upsert: true, // Create the document if it doesn't exist
+      }
+    );
+
+    console.log(updatedUser)
 
     return NextResponse.json(
       { success: true, data: { imageUrl } },

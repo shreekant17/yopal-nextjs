@@ -53,11 +53,13 @@ export const POST = async (req) => {
 
       const user = verifyToken(token);
       const email = user.email;
+      const userId = user.userId;
       const content = data.get("content");
       const type = data.get("type");
       const media = imageUrl;
 
       const post = {
+        userId: userId,
         email: email,
         content: content,
         type: type,

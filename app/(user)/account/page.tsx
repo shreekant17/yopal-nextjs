@@ -31,6 +31,7 @@ export default function App() {
     fname: "",
     lname: "",
     email: "",
+    username: "",
     password: "",
     country: "",
     avatar: "", // Stores the avatar URL
@@ -57,7 +58,7 @@ export default function App() {
             const userInfo = await getUserInfo(id); // Await the result of getUserInfo
 
             if (userInfo) {
-              const { fname, lname, email, avatar, country } =
+              const { fname, lname, email, username, avatar, country } =
                 userInfo as SessionUser;
 
               setUserData((prevData) => ({
@@ -65,6 +66,7 @@ export default function App() {
                 fname: fname || prevData.fname,
                 lname: lname || prevData.lname,
                 email: email || prevData.email,
+                username: username || prevData.username,
                 country: country || prevData.country,
                 avatar: avatar || prevData.avatar,
               }));
@@ -217,6 +219,14 @@ export default function App() {
                 name="email"
                 type="email"
                 value={userData.email}
+                onChange={handleChange}
+              />
+              <Input
+                isRequired
+                label="Username"
+                name="username"
+                type="username"
+                value={userData.username}
                 onChange={handleChange}
               />
               <Input
